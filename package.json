@@ -11,10 +11,11 @@
   "scripts": {
     "apps": "node examples/fooddash/serve-apps.mjs",
     "check-card": "node lib/check-card.mjs examples/fooddash/fact-card.json",
+    "approve": "node lib/approve.mjs examples/fooddash/fact-card.json",
     "generate": "node examples/fooddash/generate.mjs",
     "tests": "node examples/fooddash/run.mjs",
-    "demo": "npm run check-card && npm run generate && npm run generate && node examples/fooddash/run.mjs battle",
-    "unit": "node --test lib/*.test.mjs"
+    "demo": "node lib/check-card.mjs examples/fooddash/fact-card.json && node examples/fooddash/generate.mjs && node examples/fooddash/generate.mjs && node examples/fooddash/run.mjs battle",
+    "unit": "node --test lib/techniques.test.mjs lib/check-card.test.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.64.0"

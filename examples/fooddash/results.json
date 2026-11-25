@@ -1,4 +1,55 @@
 {
+  "learn": {
+    "url": "http://localhost:4173",
+    "executed": 9,
+    "passed": 4,
+    "failed": 5,
+    "failedTests": [
+      "HH-02",
+      "PK-01",
+      "PS-04",
+      "PS-06",
+      "PS-07"
+    ],
+    "planted": [
+      {
+        "id": "FD-05 20% discount",
+        "text": "The 20% restaurant discount over $25 never applies",
+        "by": [
+          "HH-02"
+        ]
+      },
+      {
+        "id": "FD-06 empty form",
+        "text": "Place Order with empty fields still places the order",
+        "by": [
+          "PS-06"
+        ]
+      }
+    ],
+    "notOnPlantedList": [
+      {
+        "what": "F01 · Delivery Fee",
+        "tests": [
+          "PK-01 (expected $0.00, got $2.99)"
+        ]
+      },
+      {
+        "what": "F08 · text \"Classic Beef Burger\"",
+        "tests": [
+          "PS-04 (expected shown, got missing)"
+        ]
+      },
+      {
+        "what": "F08 · no Total Paid",
+        "tests": [
+          "PS-07 (expected not shown, got shown)"
+        ]
+      }
+    ],
+    "runnerErrors": [],
+    "notes": []
+  },
   "battle": {
     "url": "http://localhost:4174",
     "executed": 22,
@@ -81,55 +132,10 @@
           "PS-07 (expected not shown, got shown)"
         ]
       }
-    ]
-  },
-  "learn": {
-    "url": "http://localhost:4173",
-    "executed": 9,
-    "passed": 4,
-    "failed": 5,
-    "failedTests": [
-      "HH-02",
-      "PK-01",
-      "PS-04",
-      "PS-06",
-      "PS-07"
     ],
-    "planted": [
-      {
-        "id": "FD-05 20% discount",
-        "text": "The 20% restaurant discount over $25 never applies",
-        "by": [
-          "HH-02"
-        ]
-      },
-      {
-        "id": "FD-06 empty form",
-        "text": "Place Order with empty fields still places the order",
-        "by": [
-          "PS-06"
-        ]
-      }
-    ],
-    "notOnPlantedList": [
-      {
-        "what": "F01 · Delivery Fee",
-        "tests": [
-          "PK-01 (expected $0.00, got $2.99)"
-        ]
-      },
-      {
-        "what": "F08 · text \"Classic Beef Burger\"",
-        "tests": [
-          "PS-04 (expected shown, got missing)"
-        ]
-      },
-      {
-        "what": "F08 · no Total Paid",
-        "tests": [
-          "PS-07 (expected not shown, got shown)"
-        ]
-      }
+    "runnerErrors": [],
+    "notes": [
+      "PS-01: LEARN10: the code field is disabled after Apply, so a second Apply is not possible"
     ]
   },
   "bug": {
@@ -205,6 +211,8 @@
           "PS-07 (expected not shown, got shown)"
         ]
       }
-    ]
+    ],
+    "runnerErrors": [],
+    "notes": []
   }
 }

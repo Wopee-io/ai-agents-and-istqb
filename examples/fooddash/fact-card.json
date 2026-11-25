@@ -7,7 +7,8 @@
   "approval": {
     "status": "approved",
     "by": "demo analyst",
-    "date": "2026-11-05",
+    "date": "2026-11-25",
+    "sha256": "d9a921fdae0aac8ed164596600e12954c1ed9ceb2cd63e233e7aadaaff6187ed",
     "note": "An agent pulled the facts from the spec. The analyst approved them with four questions left open (at the bottom). The generator never turns a question into a test. It only lists it."
   },
   "builds": {
@@ -161,7 +162,7 @@
         "name": "Sushi Masters",
         "deliveryFee": 199,
         "promotion": null,
-        "minOrder": { "amount": 2000, "builds": ["battle"] },
+        "minOrder": { "fact": "F09", "builds": ["battle"] },
         "menu": [
           ["California Roll", 1099, "Sushi Rolls"], ["Spicy Tuna Roll", 1299, "Sushi Rolls"], ["Dragon Roll", 1599, "Sushi Rolls"], ["Rainbow Roll", 1699, "Sushi Rolls"],
           ["Salmon Nigiri (2pc)", 699, "Nigiri"], ["Tuna Nigiri (2pc)", 899, "Nigiri"], ["Ebi Nigiri (2pc)", 599, "Nigiri"],

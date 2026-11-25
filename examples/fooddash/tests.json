@@ -1,6 +1,6 @@
 {
   "generator": "generate.mjs",
-  "cardSha256": "c9581f4d7057ff2f573d117d04f1a6cb4685124dfbdfc8f8aacd8c3f62dcc7fb",
+  "cardSha256": "d9a921fdae0aac8ed164596600e12954c1ed9ceb2cd63e233e7aadaaff6187ed",
   "counts": {
     "total": 23,
     "ready": 22,
@@ -41,6 +41,12 @@
           "side": "discount applies",
           "reachable": null,
           "used": "$25.45"
+        },
+        {
+          "requested": "$25.02",
+          "side": "discount applies",
+          "reachable": null,
+          "used": "$25.45"
         }
       ],
       "note": "A value the menu cannot build is replaced by the nearest cart on the same side of the boundary. Above the boundary, only carts where 20% comes out in whole cents (Q4)."
@@ -49,8 +55,14 @@
       "fact": "F09",
       "restaurant": "Sushi Masters",
       "boundary": "$20.00",
-      "rule": "checkout when food subtotal ≥ $20.00",
+      "rule": "checkout when food subtotal >= $20.00",
       "points": [
+        {
+          "requested": "$19.98",
+          "side": "checkout blocked",
+          "reachable": "$19.98",
+          "used": "$19.98"
+        },
         {
           "requested": "$19.99",
           "side": "checkout blocked",
@@ -74,7 +86,7 @@
     },
     {
       "fact": "F06",
-      "restaurant": "(picked by the code: smallest cart with no other discount)",
+      "restaurant": "picked by the code: smallest cart with no other discount",
       "boundary": "half a cent",
       "rule": "round to cents, halves up",
       "points": [
@@ -202,17 +214,32 @@
     {
       "fact": "F01",
       "value": "$2.99",
+      "restaurant": "Burger Palace",
       "coveredBy": "HH-01"
     },
     {
       "fact": "F01",
       "value": "Free ($0.00)",
+      "restaurant": "Pizza Corner",
       "coveredBy": "PK-01"
     },
     {
       "fact": "F01",
       "value": "$1.99",
+      "restaurant": "Sushi Masters",
       "coveredBy": "RT-02"
+    },
+    {
+      "fact": "F01",
+      "value": "$3.49",
+      "restaurant": "Mediterranean Delight",
+      "excludedBy": "Q3"
+    },
+    {
+      "fact": "F01",
+      "value": "$3.49",
+      "restaurant": "Koliba u Jána",
+      "excludedBy": "Q3"
     }
   ],
   "stateTransitions": [
@@ -784,7 +811,8 @@
         "F04"
       ],
       "stories": [
-        "FD-09"
+        "FD-09",
+        "FD-05"
       ],
       "builds": [
         "battle"
@@ -955,7 +983,7 @@
       "steps": [
         "No test until the analyst answers Q1."
       ],
-      "expected": "Unknown: Does the 20% restaurant discount (over $25) stack with the code LEARN10? If so, in what order, and is the $25 boundary checked before or after the code discount?",
+      "expected": null,
       "plan": [],
       "question": "Q1"
     },

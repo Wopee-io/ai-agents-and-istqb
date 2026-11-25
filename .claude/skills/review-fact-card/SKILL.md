@@ -5,7 +5,7 @@ description: Walk the analyst through a draft fact card - facts with their quote
 
 # Review the fact card
 
-The analyst reviews ten facts with their sources instead of two hundred generated tests. Make that review quick and exact.
+The analyst reviews a short list of facts with their sources instead of hundreds of generated tests. Make that review quick and exact.
 
 ## Steps
 
@@ -16,17 +16,19 @@ The analyst reviews ten facts with their sources instead of two hundred generate
    - An answer that states a rule becomes a new fact, or changes `values` of an existing one. Its source is the analyst: `"source": { "story": "<story>", "quote": "<the answer, word for word>", "answeredBy": "<name>", "date": "<YYYY-MM-DD>" }`. Add the answer to a document listed in `sources` (for example `spec/analyst-answers.md`), so the quote check still holds.
    - Then remove the question from `openQuestions`.
    - "I don't know yet" stays an open question. Keep its status as it is.
-5. **Ask for the approval** in so many words: "Do you approve this card, with these questions left open?" Only on a clear yes, set:
+5. **Ask for the approval** in so many words: "Do you approve this card, with these questions left open?" The analyst records it themselves:
 
-   ```json
-   "approval": { "status": "approved", "by": "<name>", "date": "<YYYY-MM-DD>", "note": "<which questions stay open>" }
+   ```bash
+   npm run approve -- "<analyst name>"     # FoodDash; any card: node lib/approve.mjs <card> "<name>"
    ```
-6. Run `npm run check-card` again, then use `generate-tests`.
+
+   The command stores who approved, when, and a hash of the facts, decision tables, test data and open questions.
+6. Run `npm run check-card`: it must say `approved by …, unchanged since`. Then use `generate-tests`.
 
 ## Rules
 
-- Never set `approved` yourself, and never on "looks fine" about a part of the card. The approval covers the whole card.
-- Any change to a fact after approval sets the status back to `draft`. The analyst approves the changed card again.
+- Never run the approve command and never edit the `approval` block yourself, not even on a clear yes: hand the command to the analyst. The approval covers the whole card.
+- Any change to the card after approval voids it: `check-card` says `CHANGED since it was approved` and the generator stops. The analyst approves the changed card again.
 - Open questions do not prevent approval. The generator lists the tests they block and writes no test for them.
 - Do not suggest an answer to a question unless the analyst asks for options. If you give options, say that the documents support none of them.
 
@@ -35,5 +37,5 @@ The analyst reviews ten facts with their sources instead of two hundred generate
 FoodDash, Q1: "Does the 20 % restaurant discount stack with the code LEARN10?" The spec gives no result for that
 combination, so decision-table rule R1 has no expected result and test RT-01 is blocked. If the analyst answers
 "No: when the restaurant discount applies, the code is rejected with 'This code cannot be combined'", that sentence
-becomes a new `rule` fact with FD-09 as its story, Q1 is removed, and the next `npm run generate` needs the binding
-to compute R1 from it.
+becomes a new `rule` fact with FD-09 as its story and Q1 is removed. The binding does not know that rule yet, so the
+next `npm run generate` stops and says so: the rule has to be added to `priceExpect` in `generate.mjs` before R1 becomes a test.

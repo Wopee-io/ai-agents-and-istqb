@@ -10,7 +10,7 @@ Five steps. A model works in step 2 and may write text in steps 4 and 5. Everyth
 | Step | Who | Skill | Done when |
 | --- | --- | --- | --- |
 | 1. Spec | product team | none: take the documents as they are | the source documents are in the example folder and listed in `sources` |
-| 2. Fact card | agent drafts, analyst approves | `extract-facts`, then `review-fact-card` | `npm run check-card` passes and `approval.status` is `approved` |
+| 2. Fact card | agent drafts, analyst approves | `extract-facts`, then `review-fact-card` | `npm run check-card` passes and says `approved by …, unchanged since` |
 | 3. Techniques | code | `generate-tests` | the generator ran without an error |
 | 4. Tests | code | `generate-tests` | two runs print the same sha256 |
 | 5. Run | browser | `run-tests`, then `report-findings` | `results.md` is written and every failure is a finding or explained |
@@ -19,7 +19,7 @@ Five steps. A model works in step 2 and may write text in steps 4 and 5. Everyth
 
 1. Find the example folder (default `examples/fooddash`) and read its `fact-card.json` if there is one.
 2. No card, or the spec changed: use `extract-facts`.
-3. Card not approved, or it has open questions the analyst has not seen: use `review-fact-card`. **Stop here until the analyst has approved.** Do not approve for them.
+3. `npm run check-card` says `not approved yet` or `CHANGED since it was approved`: use `review-fact-card`. **Stop here until the analyst has approved.** Do not approve for them.
 4. Use `generate-tests`.
 5. Use `run-tests`, then `report-findings`.
 

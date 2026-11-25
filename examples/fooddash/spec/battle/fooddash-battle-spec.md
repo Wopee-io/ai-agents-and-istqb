@@ -1,6 +1,6 @@
 # FoodDash — Battle stories
 
-Shipped on the newer FoodDash build (port 4174 in your codespace). The rules in [the main spec](../fooddash-spec.md)
+Shipped on the newer FoodDash build (`battle`, port 4174). The rules in [the main spec](../fooddash-spec.md)
 still apply.
 
 ---

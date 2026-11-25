@@ -2,7 +2,7 @@
 
 FoodDash lets a hungry customer find a restaurant, build an order and have it delivered, without
 creating an account. This is what the product team asked for. It describes intended behaviour —
-the frozen FoodDash build in your codespace is the build under test.
+the FoodDash builds in this repository are the builds under test.
 
 Each story has an ID (`FD-01` … `FD-08`). Quote the ID in test names, plans and bug reports, so
 everyone can trace a test back to the requirement it checks.
@@ -24,8 +24,6 @@ The landing page (`/`) lists the restaurants under **Popular Restaurants**.
 - A restaurant that does not deliver to the current address is shown greyed out with a *Not available at
   your address* badge, and the subtitle counts them (*1 don't deliver there*). It cannot be opened.
 
-![Landing page](screens/01-landing.jpg)
-
 ---
 
 ## FD-02 · Search and filter
@@ -43,10 +41,6 @@ The landing page (`/`) lists the restaurants under **Popular Restaurants**.
   *burger* shows only restaurants that match both.
 - When nothing matches, the page says so — *No restaurants found* — with a hint to try another
   search or filter.
-
-| Pizza filter | Search: burger | Nothing found |
-| --- | --- | --- |
-| ![Pizza filter](screens/02-landing-cuisine-filter-pizza.jpg) | ![Search results](screens/03-search-results-burger.jpg) | ![No results](screens/04-search-no-results.jpg) |
 
 ---
 
@@ -68,8 +62,6 @@ Rules:
 - Every button can be used with a screen reader: each one has an accessible name that says what
   it does, including icon-only buttons such as quick-add.
 
-![Restaurant page](screens/05-restaurant-detail-burger-palace.jpg)
-
 ---
 
 ## FD-04 · Customise a dish
@@ -86,8 +78,6 @@ The dish page (`/product/<id>`) shows the photo, description, rating, preparatio
   changes size, add-ons or quantity.
 - Tabs show *Ingredients*, *Reviews* and *Nutrition*.
 - The cart is reachable from this page, the same as from every other page in the order flow.
-
-![Dish page](screens/06-product-detail.jpg)
 
 ---
 
@@ -111,13 +101,6 @@ are in the cart.
 - **Proceed to Checkout** takes the customer to checkout.
 - An empty cart says so, offers a way back to the restaurants, and offers **no** way to check out.
 - The cart survives a page reload: refreshing the browser does not lose the order.
-
-| One item | Several items | Empty |
-| --- | --- | --- |
-| ![One item](screens/07-cart-drawer-one-item.jpg) | ![Several items](screens/08-cart-drawer-multiple-items.jpg) | ![Empty cart](screens/09-cart-drawer-empty.jpg) |
-
-> Screenshots show the build on the day they were taken. Where a screenshot and a rule disagree, the
-> rule is the requirement — that disagreement is a finding, not a correction to the spec.
 
 ---
 
@@ -143,10 +126,6 @@ an **Order Summary** with the same lines as the cart.
   is placed, and each missing field shows a message saying what is needed.
 - Opening checkout with an empty cart shows an empty state with a way back to the restaurants —
   never a form that could place an empty order.
-
-| Blank form | Filled in |
-| --- | --- |
-| ![Checkout form](screens/10-checkout-form.jpg) | ![Checkout filled](screens/11-checkout-form-filled.jpg) |
 
 ---
 
@@ -174,10 +153,6 @@ Rules:
 - **Total paid** is the amount of the placed order. It cannot be changed by editing the address in
   the browser.
 
-| Confirmation | Tracking |
-| --- | --- |
-| ![Order confirmed](screens/12-order-confirmation.jpg) | ![Order tracking](screens/13-order-tracking.jpg) |
-
 ---
 
 ## FD-08 · Page not found
@@ -187,12 +162,10 @@ Rules:
 - Any address that is not a FoodDash page shows **404 — Page not found** and a **Return to Home**
   link.
 
-![404 page](screens/14-not-found.jpg)
-
 ---
 
 ## Not in scope
 
 - **Signing in** (`/auth`). The page exists, but ordering never requires an account, and it is not
-  part of this lab. [Screenshot](screens/15-auth.jpg).
+  part of this example.
 - Paying for real, changing the delivery location in the header, and anything a restaurant sees.

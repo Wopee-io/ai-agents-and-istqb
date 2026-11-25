@@ -1,6 +1,6 @@
 # FoodDash: tests from the fact card
 
-Generated from `fact-card.json` (sha256 `c9581f4d7057…`) by `generate.mjs`. No model, no randomness: same card = same tests.
+Generated from `fact-card.json` (sha256 `d9a921fdae0a…`) by `generate.mjs`. No model, no randomness: same card = same tests.
 
 **23 tests**: 22 ready, 1 blocked by a question. By technique: boundary values (3-value) 7, decision table 3, each parameter value 1, state transitions 12.
 
@@ -15,16 +15,18 @@ Per build: learn 9, battle 22, bug 9 (FD-09 to FD-11 exist only in the newer bat
 | $24.99 | no discount | not possible, nearest $24.98 |
 | $25.00 | no discount | not possible, nearest $24.98 |
 | $25.01 | discount applies | not possible, nearest $25.45 |
+| $25.02 | discount applies | not possible, nearest $25.45 |
 
-**F09 Minimum order** (Sushi Masters; checkout when food subtotal ≥ $20.00). The menu cannot build $19.99, $20.00, $20.01. The code takes the nearest carts on both sides.
+**F09 Minimum order** (Sushi Masters; checkout when food subtotal >= $20.00). The menu cannot build $19.99, $20.00, $20.01. The code takes the nearest carts on both sides.
 
 | wanted value | side | cart used |
 | --- | --- | --- |
+| $19.98 | checkout blocked | $19.98 |
 | $19.99 | checkout blocked | not possible, nearest $19.98 |
 | $20.00 | checkout allowed | not possible, nearest $20.97 |
 | $20.01 | checkout allowed | not possible, nearest $20.97 |
 
-**F06 LEARN10 discount rounding** ((picked by the code: smallest cart with no other discount); round to cents, halves up). Rounding boundary: x.xx4 down, x.xx5 up, x.xx6 up.
+**F06 LEARN10 discount rounding** (picked by the code: smallest cart with no other discount; round to cents, halves up). Rounding boundary: x.xx4 down, x.xx5 up, x.xx6 up.
 
 | wanted value | side | cart used |
 | --- | --- | --- |
@@ -120,7 +122,7 @@ Per build: learn 9, battle 22, bug 9 (FD-09 to FD-11 exist only in the newer bat
 - **Fact:** F04 Restaurant discount 20% over $25 (FD-05); F05 Promo code LEARN10 (FD-09)
 - **Build:** — · **BLOCKED by question Q1**
 - **Steps:** No test until the analyst answers Q1.
-- **Expected result (computed by code):** Unknown: Does the 20% restaurant discount (over $25) stack with the code LEARN10? If so, in what order, and is the $25 boundary checked before or after the code discount?
+- **Expected result:** unknown until Q1 is answered: Does the 20% restaurant discount (over $25) stack with the code LEARN10? If so, in what order, and is the $25 boundary checked before or after the code discount?
 
 ### RT-02 · Sushi Masters above the minimum + LEARN10
 

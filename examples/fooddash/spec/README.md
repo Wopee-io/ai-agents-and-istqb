@@ -1,7 +1,7 @@
 # Spec
 
-What FoodDash is **supposed** to do. Every expected result in the labs comes from here, never from what the app shows.
+What FoodDash is **supposed** to do, as the product team wrote it. Every fact on the fact card quotes a sentence
+from these two documents, and every expected result is computed from those facts, never from what the app shows.
 
-- [`fooddash-spec.md`](fooddash-spec.md): `FD-01` … `FD-08`, the FoodDash build (port 4173).
-- [`battle/fooddash-battle-spec.md`](battle/fooddash-battle-spec.md): `FD-09` … `FD-11`, the newer build (port 4174).
-- [`screens/`](screens/): what each page looked like on the day the screenshots were taken. They still show the app's old name. Where a screenshot and a rule disagree, the rule wins.
+- [`fooddash-spec.md`](fooddash-spec.md): stories `FD-01` to `FD-08`, in every build.
+- [`battle/fooddash-battle-spec.md`](battle/fooddash-battle-spec.md): stories `FD-09` to `FD-11`, only in the newer build (`battle`).

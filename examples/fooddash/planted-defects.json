@@ -1,5 +1,5 @@
 {
-  "note": "Scoring key, not generator input. The defects planted in the builds (apps/README.md, table Defects per build). The generator never reads this file; run.mjs only uses it to sort the failed checks into planted and not planted.",
+  "note": "Scoring key, not generator input. The defects planted in the builds (apps/README.md, table Planted defects). The generator never reads this file; run.mjs only uses it to sort the failed checks into planted and not planted.",
   "defects": [
     { "id": "FD-05 20% discount", "builds": ["learn", "battle", "bug"], "text": "The 20% restaurant discount over $25 never applies", "match": { "fact": "F04", "what": "restaurant discount" } },
     { "id": "FD-06 empty form", "builds": ["learn", "battle", "bug"], "text": "Place Order with empty fields still places the order", "match": { "fact": "F08", "what": ["no Order Confirmed!", "button Place Order present"] } },

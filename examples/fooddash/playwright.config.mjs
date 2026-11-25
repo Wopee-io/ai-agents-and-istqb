@@ -17,6 +17,7 @@ export default defineConfig({
     headless: true,
     viewport: { width: 1280, height: 720 },
     video: process.env.VIDEO ? { mode: 'on', size: { width: 1280, height: 720 } } : 'off',
+    actionTimeout: 15_000,
     launchOptions: { slowMo: Number(process.env.SLOWMO || 0) },
   },
 })

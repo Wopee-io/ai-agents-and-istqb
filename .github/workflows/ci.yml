@@ -19,10 +19,15 @@ jobs:
           npm run generate
           npm run generate
           git diff --exit-code examples/fooddash/tests.json examples/fooddash/tests.md
+      - name: A changed card is not approved any more
+        run: |
+          sed -i 's/"boundary": 2000/"boundary": 1500/' examples/fooddash/fact-card.json
+          if npm run generate; then echo "the generator accepted a card that changed after approval"; exit 1; fi
+          git checkout examples/fooddash/fact-card.json
       - run: npx playwright install --with-deps chromium
       - name: The tests find every planted defect
+        shell: bash
         run: |
+          set -o pipefail
           npm run tests | tee run.log
-          grep -q "battle  run 22, passed 9, failed 13 · planted defects found 5/5" run.log
-          grep -q "learn   run 9, passed 4, failed 5 · planted defects found 2/2" run.log
-          grep -q "bug     run 9, passed 1, failed 8 · planted defects found 5/5" run.log
+          for line in "battle  run 22, passed 9, failed 13 · planted defects found 5/5" "learn   run 9, passed 4, failed 5 · planted defects found 2/2" "bug     run 9, passed 1, failed 8 · planted defects found 5/5"; do grep -qF "$line" run.log || { echo "missing in the run output: $line"; exit 1; }; done

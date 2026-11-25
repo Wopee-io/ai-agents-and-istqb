@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 // node generate.mjs [--draft] → reads fact-card.json, writes tests.json + tests.md, prints their sha256.
+// --draft writes tests.draft.json + tests.draft.md instead (a preview of an unapproved card).
 // Plain Node, no dependencies, no randomness, no clock: the same card always gives the same bytes.
 //
 // This file is the FoodDash binding: it knows the product (carts, prices, screens). The techniques
@@ -9,25 +10,36 @@
 //   lifecycle → state transitions: every valid transition at least once (0-switch) + every forbidden one
 //   parameter → every value at least once (each-choice) where the tests above miss a value
 // Amounts are integer cents. Expected results are computed here; the app is never asked.
-// A card that the analyst has not approved gives no tests (--draft overrides, for a preview).
+// A card that the analyst has not approved, or that changed after the approval, gives no tests.
 
 import { readFileSync, writeFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { boundaryPoints, nearestReachable, decisionRules, shortestPath, transitionTours, uncoveredValues } from '../../lib/techniques.mjs'
+import { boundaryPoints, firstAbove, nearestReachable, decisionRules, transitionTours, forbiddenPaths, uncoveredValues } from '../../lib/techniques.mjs'
+import { approvalState, contentHash } from '../../lib/check-card.mjs'
 
 const dir = dirname(fileURLToPath(import.meta.url))
 const cardText = readFileSync(join(dir, 'fact-card.json'), 'utf8')
 const card = JSON.parse(cardText)
 const sha = (s) => createHash('sha256').update(s).digest('hex')
 
-if (card.approval?.status !== 'approved' && !process.argv.includes('--draft')) {
-  console.error(`fact-card.json is not approved (approval.status: "${card.approval?.status ?? 'missing'}").`)
-  console.error('Facts come before tests: the analyst reviews the card and sets approval.status to "approved".')
-  console.error('For a preview of what an unapproved card would give: node generate.mjs --draft')
+// Facts come before tests: no approval, no tests. --draft writes a preview to tests.draft.* and leaves the real files alone.
+const draft = process.argv.includes('--draft')
+const state = approvalState(card)
+if (state !== 'approved' && !draft) {
+  console.error(state === 'changed' ? 'fact-card.json changed after it was approved.' : `fact-card.json is not approved (approval.status: "${card.approval?.status ?? 'missing'}").`)
+  console.error('Facts come before tests: the analyst reviews the card and approves it (npm run approve -- "<name>").')
+  console.error('For a preview that does not touch tests.json: npm run generate -- --draft')
   process.exit(1)
 }
+// a product problem (a rule the binding does not know, a value the menu cannot build) stops with one clear line
+const stop = (message) => {
+  console.error(`Cannot generate: ${message}`)
+  process.exit(1)
+}
+const OPS = { '>': (a, b) => a > b, '>=': (a, b) => a >= b }
+const compare = (fact, operator) => OPS[operator] ?? stop(`${fact}: comparison "${operator}" is not supported, use ">" or ">="`)
 
 const F = Object.fromEntries(card.facts.map((f) => [f.id, f]))
 const RESTAURANTS = card.data.restaurants
@@ -38,6 +50,7 @@ const usd = (c) => (c < 0 ? '-' : '') + '$' + (Math.abs(c) / 100).toFixed(2)
 const short = (c) => usd(c).replace(/\.00$/, '') // $25, $20: the way the spec writes round amounts
 const feeOf = (r) => (r.deliveryFee === 'Free' ? F.F01.values.freeMeans : r.deliveryFee)
 const feeText = (r) => (r.deliveryFee === 'Free' ? 'Free ($0.00)' : usd(r.deliveryFee))
+if (F.F06.values.rounding !== 'half-up') stop(`F06: rounding "${F.F06.values.rounding}" is not supported, the binding rounds half-up`)
 const pct = (cents, rate) => Math.floor((cents * rate + 50) / 100) // half-up, integer cents
 const exactPct = (cents, rate) => (cents * rate) % 100 === 0
 const thousandths = (cents, rate) => '$' + ((cents * rate) / 10000).toFixed(3)
@@ -103,7 +116,7 @@ function priceExpect(r, items, code) {
   const service = F.F02.values.amount
   let discount = null
   if (hasPromo20(r) && sub > promo20.boundary) {
-    if (code) throw new Error('Q1: no expected result for restaurant promotion + code')
+    if (code) throw new Error('no expected result on the card for restaurant promotion + code')
     discount = { kind: 'restaurant', amount: pct(sub, promo20.rate) }
   } else if (code) discount = { kind: 'LEARN10', amount: pct(sub, F.F05.values.rate) }
   const total = sub - (discount?.amount ?? 0) + delivery + service
@@ -193,21 +206,22 @@ const reachable = (r, ok = () => true) => carts(r).filter((c) => ok(c.sub)).map(
 // F04: restaurant promotion 20 % once the subtotal passes $25
 {
   const r = RESTAURANTS.find(hasPromo20)
-  const applies = (s) => s > promo20.boundary
+  const applies = (s) => compare('F04', promo20.appliesWhen)(s, promo20.boundary)
   const rows = []
   const chosen = []
   const exactOk = (s) => !applies(s) || exactPct(s, promo20.rate) // Q4: only carts whose 20 % is whole cents
-  for (const p of boundaryPoints(promo20.boundary)) {
+  for (const p of boundaryPoints(firstAbove(promo20.boundary, promo20.appliesWhen))) {
     const { side, exact: reached, candidate: cart } = nearestReachable(p, reachable(r, exactOk), applies)
+    if (!cart) stop(`F04: the ${r.name} menu has no cart ${side ? 'where the discount applies' : 'below the discount'} near ${usd(p)}`)
     rows.push({ requested: usd(p), side: side ? 'discount applies' : 'no discount', reachable: reached ? usd(p) : null, used: usd(cart.sub) })
     if (!chosen.some((c) => c.sub === cart.sub)) chosen.push({ ...cart, side })
   }
-  bvaReport.push({ fact: 'F04', restaurant: r.name, boundary: usd(promo20.boundary), rule: `discount when subtotal > ${short(promo20.boundary)}`, points: rows, note: 'A value the menu cannot build is replaced by the nearest cart on the same side of the boundary. Above the boundary, only carts where 20% comes out in whole cents (Q4).' })
+  bvaReport.push({ fact: 'F04', restaurant: r.name, boundary: usd(promo20.boundary), rule: `discount when subtotal ${promo20.appliesWhen} ${short(promo20.boundary)}`, points: rows, note: 'A value the menu cannot build is replaced by the nearest cart on the same side of the boundary. Above the boundary, only carts where 20% comes out in whole cents (Q4).' })
   for (const c of chosen) {
     const items = itemsOf(r, c)
     const e = priceExpect(r, items, null)
     addTest('bva', {
-      title: `20% discount: cart ${c.side ? 'above' : 'below'} the ${short(promo20.boundary)} boundary (${usd(c.sub)})`,
+      title: `20% discount: cart ${c.sub === promo20.boundary ? 'on' : c.side ? 'above' : 'below'} the ${short(promo20.boundary)} boundary (${usd(c.sub)})`,
       facts: ['F04'],
       restaurant: r,
       data: { restaurant: r.name, items, code: null },
@@ -221,23 +235,24 @@ const reachable = (r, ok = () => true) => carts(r).filter((c) => ok(c.sub)).map(
 {
   const v = F.F09.values
   const r = R(v.restaurant)
-  const allowed = (s) => s >= v.boundary
+  const allowed = (s) => compare('F09', v.allowedWhen)(s, v.boundary)
   const rows = []
   const unreachable = []
   const chosen = []
-  for (const p of boundaryPoints(v.boundary)) {
+  for (const p of boundaryPoints(firstAbove(v.boundary, v.allowedWhen))) {
     const { side, exact: reached, candidate: cart } = nearestReachable(p, reachable(r), allowed)
+    if (!cart) stop(`F09: the ${r.name} menu has no cart ${side ? 'that reaches' : 'below'} the minimum of ${usd(v.boundary)}`)
     rows.push({ requested: usd(p), side: side ? 'checkout allowed' : 'checkout blocked', reachable: reached ? usd(p) : null, used: usd(cart.sub) })
     if (!reached) unreachable.push(usd(p))
     if (!chosen.some((c) => c.sub === cart.sub)) chosen.push({ ...cart, side })
   }
-  bvaReport.push({ fact: 'F09', restaurant: r.name, boundary: usd(v.boundary), rule: `checkout when food subtotal ≥ ${usd(v.boundary)}`, points: rows, note: unreachable.length ? `The menu cannot build ${unreachable.join(', ')}. The code takes the nearest carts on both sides.` : 'The menu can build every boundary value.' })
+  bvaReport.push({ fact: 'F09', restaurant: r.name, boundary: usd(v.boundary), rule: `checkout when food subtotal ${v.allowedWhen} ${usd(v.boundary)}`, points: rows, note: unreachable.length ? `The menu cannot build ${unreachable.join(', ')}. The code takes the nearest carts on both sides.` : 'The menu can build every boundary value.' })
   for (const c of chosen) {
     const items = itemsOf(r, c)
     const missing = v.boundary - c.sub
     const msg = v.message.replace('${missing}', usd(missing))
     addTest('bva', {
-      title: `Minimum order ${short(v.boundary)}: cart ${c.side ? 'above' : 'just below'} the boundary (${usd(c.sub)})`,
+      title: `Minimum order ${short(v.boundary)}: cart ${c.sub === v.boundary ? 'on' : c.side ? 'above' : 'just below'} the boundary (${usd(c.sub)})`,
       facts: ['F09'],
       restaurant: r,
       data: { restaurant: r.name, items, code: null },
@@ -282,14 +297,16 @@ const reachable = (r, ok = () => true) => carts(r).filter((c) => ok(c.sub)).map(
       plan: [op.open(best.r), ...op.add(best.r, best.items), op.cart(), op.checkout(), op.code('LEARN10'), summaryCheck('checkout', e, 'F06')],
     })
   }
-  bvaReport.push({ fact: 'F06', restaurant: '(picked by the code: smallest cart with no other discount)', boundary: 'half a cent', rule: 'round to cents, halves up', points: rows, note: 'Rounding boundary: x.xx4 down, x.xx5 up, x.xx6 up.' })
+  bvaReport.push({ fact: 'F06', restaurant: 'picked by the code: smallest cart with no other discount', boundary: 'half a cent', rule: 'round to cents, halves up', points: rows, note: 'Rounding boundary: x.xx4 down, x.xx5 up, x.xx6 up.' })
 }
 
 // =====================================================================================
 // 2. Rules → decision table
 // =====================================================================================
 const dtReport = []
-for (const dt of card.decisionTables ?? [{ id: 'DT1', name: 'Discounts and minimum order', conditions: ['F04', 'F05', 'F09'] }]) {
+const DT_CONDITIONS = ['F04', 'F05', 'F09'] // the one table this binding knows how to price
+for (const dt of card.decisionTables ?? []) {
+  if (JSON.stringify(dt.conditions) !== JSON.stringify(DT_CONDITIONS)) stop(`${dt.id}: the binding has no rules for the conditions ${dt.conditions.join(', ')} (it knows ${DT_CONDITIONS.join(', ')})`)
   const minV = F.F09.values
   for (const { rule: ruleId, values: [c1, c2, c3] } of decisionRules([['yes', 'no'], ['yes', 'no'], ['none', 'met', 'not met']])) {
     const rule = { rule: ruleId, '20% discount applies': c1, 'LEARN10 applied': c2, 'minimum order': c3 }
@@ -302,17 +319,20 @@ for (const dt of card.decisionTables ?? [{ id: 'DT1', name: 'Discounts and minim
       continue
     }
     if (c1 === 'yes' && c2 === 'yes') {
+      // the card has no rule for this combination: it is a test only once the analyst has answered
+      const q = (card.openQuestions ?? []).find((q) => ['F04', 'F05'].every((f) => (q.facts ?? []).includes(f)))
+      if (!q) stop(`${dt.id} ${rule.rule}: the card has no open question and no rule for "20% discount applies" with "LEARN10 applied". If the analyst answered it, the new rule has to be added to priceExpect in this binding.`)
       const t = addTest('dt', {
         title: '20% discount and LEARN10 together: the spec is silent',
         facts: ['F04', 'F05'],
         status: 'blocked',
-        question: 'Q1',
+        question: q.id,
         data: { restaurant: rs[0].name, items: null, code: 'LEARN10' },
-        steps: ['No test until the analyst answers Q1.'],
-        expected: 'Unknown: ' + card.openQuestions.find((q) => q.id === 'Q1').question,
+        steps: [`No test until the analyst answers ${q.id}.`],
+        expected: null,
         plan: [],
       })
-      dtReport.push({ ...rule, result: 'question Q1', test: t.id })
+      dtReport.push({ ...rule, result: `question ${q.id}`, test: t.id })
       continue
     }
     const r = rs[0]
@@ -333,6 +353,7 @@ for (const dt of card.decisionTables ?? [{ id: 'DT1', name: 'Discounts and minim
     if (same) {
       same.techniques.push(`${TECH.dt} (${rule.rule})`)
       for (const f of factIds) if (!same.facts.includes(f)) same.facts.push(f)
+      same.stories = storiesOf(same.facts)
       dtReport.push({ ...rule, result: 'covered', test: same.id })
       continue
     }
@@ -379,7 +400,7 @@ const eachReport = []
   for (const r of priced) {
     const v = feeText(r)
     if (!fresh.delete(v)) {
-      eachReport.push({ fact: 'F01', value: v, coveredBy: tests.find((t) => t.data.restaurant === r.name && t.plan.some((o) => o.op === 'expectSummary')).id })
+      eachReport.push({ fact: 'F01', value: v, restaurant: r.name, coveredBy: tests.find((t) => t.plan.some((o) => o.op === 'expectSummary') && feeText(R(t.data.restaurant)) === v).id })
       continue
     }
     const items = itemsOf(r, pick(r, () => true))
@@ -392,8 +413,9 @@ const eachReport = []
       expected: expectText(e),
       plan: [op.open(r), ...op.add(r, items), op.cart(), summaryCheck('cart', e, 'F01')],
     })
-    eachReport.push({ fact: 'F01', value: v, coveredBy: t.id })
+    eachReport.push({ fact: 'F01', value: v, restaurant: r.name, coveredBy: t.id })
   }
+  for (const r of RESTAURANTS.filter((r) => r.excludedFromPrices)) eachReport.push({ fact: 'F01', value: feeText(r), restaurant: r.name, excludedBy: r.excludedFromPrices })
 }
 
 // =====================================================================================
@@ -406,7 +428,6 @@ const stReport = []
   const m = F.F07.values
   const ex = F.F05.values.example
   const r = R(ex.restaurant)
-  const sub = subOf(r, ex.items)
   const none = priceExpect(r, ex.items, null)
   const withCode = priceExpect(r, ex.items, 'LEARN10')
   for (const { chain } of transitionTours(m)) {
@@ -415,6 +436,7 @@ const stReport = []
       if (t.id === 'p1') plan.push(op.code(t.input), { op: 'expectText', text: t.shows, fact: 'F07' }, { op: 'expectDiscountCount', count: 0, fact: 'F07' })
       if (t.id === 'p2') plan.push(op.code(t.input), { op: 'expectDiscountCount', count: 1, fact: 'F07' }, summaryCheck('checkout', withCode, 'F05'))
       if (t.id === 'p3') plan.push({ ...op.code(t.input), mayBeDisabled: true }, { op: 'expectDiscountCount', count: 1, fact: 'F07' })
+      if (!['p1', 'p2', 'p3', 'p4'].includes(t.id)) stop(`F07: the binding has no steps for transition ${t.id}`)
       if (t.id === 'p4') plan.push({ op: 'removeCode' }, { op: 'expectDiscountCount', count: 0, fact: 'F07' }, { op: 'expectLine', line: 'Total', amount: none.Total, fact: 'F07' })
     }
     const test = addTest('st', {
@@ -427,7 +449,6 @@ const stReport = []
     })
     stReport.push({ fact: 'F07', test: test.id, covers: chain.map((t) => t.id) })
   }
-  void sub
 }
 
 // F08 order lifecycle
@@ -454,7 +475,7 @@ const stReport = []
       case 'o8': return [op.cart(), { op: 'removeItem', item: items[0][0] }, { op: 'expectButton', name: 'Proceed to Checkout', present: false, fact: 'F08' }]
       case 'o9': return [{ op: 'reload' }, op.cart(), { op: 'expectText', text: items[0][0], scope: 'cart', fact: 'F08' }]
     }
-    return []
+    return stop(`F08: the binding has no steps for transition ${t.id} (${t.from} → ${t.event})`)
   }
   for (const { chain, end } of transitionTours(m)) {
     const plan = []
@@ -479,8 +500,8 @@ const stReport = []
     })
     stReport.push({ fact: 'F08', test: test.id, covers: [...chain.map((t) => t.id), ...extra.map((x) => x.id)] })
   }
-  for (const x of m.forbidden.filter((x) => x.from !== m.final)) {
-    const path = shortestPath(m, m.initial, x.from)
+  // a forbidden move out of the final state is checked at the end of the tour that reaches it (expectStaysAt)
+  for (const { forbidden: x, path } of forbiddenPaths(m).filter((p) => p.forbidden.from !== m.final)) {
     const plan = [...prefixOps(path)]
     let expected
     if (x.id === 'x1') {
@@ -492,7 +513,7 @@ const stReport = []
     } else if (x.id === 'x3') {
       plan.push({ op: 'goto', path: `/order/${x.input}` }, { op: 'expectNoText', text: 'Total Paid', fact: 'F08' })
       expected = `No tracking page is shown for ${x.input}.`
-    }
+    } else stop(`F08: the binding has no steps for forbidden transition ${x.id} (${x.from} → ${x.event})`)
     const test = addTest('st', {
       title: `Forbidden transition: ${x.from} → ${x.event}`,
       facts: ['F08'],
@@ -514,6 +535,7 @@ const stReport = []
       for (const t of chain) {
         if (t.id === 'f1') plan.push({ op: 'toggleFavourite', restaurant: r.name }, { op: 'expectButton', name: `Remove ${r.name} from favourites`, present: true, fact: 'F10' }, { op: 'expectPath', path: '/', fact: 'F10' })
         if (t.id === 'f2') plan.push({ op: 'reload' }, { op: 'expectButton', name: `Remove ${r.name} from favourites`, present: true, fact: 'F10' })
+        if (!['f1', 'f2', 'f3'].includes(t.id)) stop(`F10: the binding has no steps for transition ${t.id}`)
         if (t.id === 'f3') plan.push({ op: 'toggleFavourite', restaurant: r.name }, { op: 'expectButton', name: `Add ${r.name} to favourites`, present: true, fact: 'F10' })
       }
       const test = addTest('st', {
@@ -541,7 +563,7 @@ for (const t of tests) {
 const perBuild = Object.fromEntries(Object.keys(card.builds).map((b) => [b, ready.filter((t) => t.builds.includes(b)).length]))
 const out = {
   generator: 'generate.mjs',
-  cardSha256: sha(cardText),
+  cardSha256: contentHash(card),
   counts: { total: tests.length, ready: ready.length, blocked: tests.length - ready.length, byTechnique: byTech, perBuild },
   boundaryValues: bvaReport,
   decisionTable: dtReport,
@@ -578,13 +600,18 @@ for (const t of tests) {
   md.push(`- **Fact:** ${t.facts.map((f) => `${f} ${F[f].name} (${F[f].source.story})`).join('; ')}`)
   md.push(`- **Build:** ${t.builds.length ? t.builds.join(', ') : '—'}${t.status === 'blocked' ? ` · **BLOCKED by question ${t.question}**` : ''}`)
   md.push(`- **Steps:** ${t.steps.join(' ')}`)
-  md.push(`- **Expected result (computed by code):** ${t.expected}`, '')
+  md.push(t.status === 'blocked' ? `- **Expected result:** unknown until ${t.question} is answered: ${card.openQuestions.find((q) => q.id === t.question).question}` : `- **Expected result (computed by code):** ${t.expected}`, '')
 }
 const mdText = md.join('\n')
 
-writeFileSync(join(dir, 'tests.json'), json)
-writeFileSync(join(dir, 'tests.md'), mdText)
-console.log(`${tests.length} tests (${ready.length} ready, ${tests.length - ready.length} blocked by question Q1) · ${Object.entries(byTech).map(([k, v]) => `${k}: ${v}`).join(' · ')}`)
+// every ready test must check something: a plan without a check would pass whatever the app does
+for (const t of ready) if (!t.plan.some((o) => o.op.startsWith('expect'))) stop(`${t.id} "${t.title}" has no check`)
+const blockedBy = [...new Set(tests.filter((t) => t.status === 'blocked').map((t) => t.question))]
+const name = draft ? 'tests.draft' : 'tests'
+writeFileSync(join(dir, `${name}.json`), json)
+writeFileSync(join(dir, `${name}.md`), mdText)
+if (draft) console.log(`DRAFT from a card that is ${state}: written to ${name}.json and ${name}.md, the real tests are untouched.`)
+console.log(`${tests.length} tests (${ready.length} ready, ${tests.length - ready.length} blocked${blockedBy.length ? ` by question ${blockedBy.join(', ')}` : ''}) · ${Object.entries(byTech).map(([k, v]) => `${k}: ${v}`).join(' · ')}`)
 console.log(`per build: ${Object.entries(perBuild).map(([b, n]) => `${b} ${n}`).join(', ')}`)
-console.log(`sha256 tests.json  ${sha(json)}`)
-console.log(`sha256 tests.md    ${sha(mdText)}`)
+console.log(`sha256 ${name}.json  ${sha(json)}`)
+console.log(`sha256 ${name}.md    ${sha(mdText)}`)

@@ -3,6 +3,7 @@
 // and compares. Checks are soft: a test records every check, then fails if any check failed.
 import { test, expect } from '@playwright/test'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 
 const BUILD = process.env.BUILD || 'battle'
 const ONLY = process.env.ONLY ? process.env.ONLY.split(',') : null
@@ -249,7 +250,9 @@ for (const t of suite.tests.filter((t) => t.status === 'ready' && t.builds.inclu
       check: async (fact, what, expected, actual, ok) => {
         checks.push({ fact, what, expected, actual, ok })
         if (!ok && checks.filter((c) => !c.ok).length === 1) {
-          await page.screenshot({ path: new URL(`${t.id}.png`, resultsDir).pathname }).catch(() => {})
+          // let the "Added to cart!" toast go first, so it does not cover what the check is about
+          await page.getByText('Added to cart!').first().waitFor({ state: 'hidden', timeout: 6000 }).catch(() => {})
+          await page.screenshot({ path: fileURLToPath(new URL(`${t.id}.png`, resultsDir)) }).catch(() => {})
         }
       },
     }

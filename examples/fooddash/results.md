@@ -2,6 +2,21 @@
 
 Tests: `tests.json` (23 generated, 22 runnable, 1 blocked by a question).
 
+## learn (http://localhost:4173)
+
+Run 9, passed 4, failed 5 (HH-02, PK-01, PS-04, PS-06, PS-07).
+
+Planted defects: found **2 of 2**.
+
+- FOUND FD-05 20% discount: The 20% restaurant discount over $25 never applies (HH-02)
+- FOUND FD-06 empty form: Place Order with empty fields still places the order (PS-06)
+
+Failures not on the planted list (the app differs from the spec):
+
+- F01 · Delivery Fee: PK-01 (expected $0.00, got $2.99)
+- F08 · text "Classic Beef Burger": PS-04 (expected shown, got missing)
+- F08 · no Total Paid: PS-07 (expected not shown, got shown)
+
 ## battle (http://localhost:4174)
 
 Run 22, passed 9, failed 13 (HH-02, HH-03, HH-05, HH-06, HH-07, PK-01, PS-01, PS-04, PS-06, PS-07, PS-12, RT-02, RT-03).
@@ -20,20 +35,9 @@ Failures not on the planted list (the app differs from the spec):
 - F08 · text "Classic Beef Burger": PS-04 (expected shown, got missing)
 - F08 · no Total Paid: PS-07 (expected not shown, got shown)
 
-## learn (http://localhost:4173)
+Notes from the runner:
 
-Run 9, passed 4, failed 5 (HH-02, PK-01, PS-04, PS-06, PS-07).
-
-Planted defects: found **2 of 2**.
-
-- FOUND FD-05 20% discount: The 20% restaurant discount over $25 never applies (HH-02)
-- FOUND FD-06 empty form: Place Order with empty fields still places the order (PS-06)
-
-Failures not on the planted list (the app differs from the spec):
-
-- F01 · Delivery Fee: PK-01 (expected $0.00, got $2.99)
-- F08 · text "Classic Beef Burger": PS-04 (expected shown, got missing)
-- F08 · no Total Paid: PS-07 (expected not shown, got shown)
+- PS-01: LEARN10: the code field is disabled after Apply, so a second Apply is not possible
 
 ## bug (http://localhost:4175)
 

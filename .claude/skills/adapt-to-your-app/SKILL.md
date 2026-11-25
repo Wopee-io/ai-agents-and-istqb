@@ -19,7 +19,7 @@ Three layers. Two you keep, one you write.
 2. **Create `examples/<product>/`** with the source documents in `spec/`, unedited. If the documents are Word or PDF, convert them to Markdown or text and keep the wording as it is.
 3. **Fill the card** with `extract-facts`, then `review-fact-card`. Point `builds.<key>.url` at a test environment of your app (leave `dist` out when the app runs elsewhere). Stop until the card is approved.
 4. **Write the binding**, `examples/<product>/generate.mjs`. Start from the FoodDash one and keep its outline:
-   - read the card, refuse an unapproved one;
+   - read the card, refuse one that is not approved or changed after approval (`approvalState` from `lib/check-card.mjs`);
    - for each fact type call the technique from `lib/techniques.mjs`;
    - turn each abstract result into a test: a plan of operations for the runner, readable steps, and the expected result computed from the fact;
    - write `tests.json` and `tests.md`, print their sha256.
@@ -27,7 +27,7 @@ Three layers. Two you keep, one you write.
    What you write is the part that knows the product. In FoodDash that is: how a wanted subtotal becomes a cart from the menu (`carts`, `pick`), how a price is computed from the facts (`priceExpect`), and which clicks a transition means (`transitionOps`).
 5. **Write the runner**, `tests/run.spec.mjs`: one `case` per operation in your plans. Copy the FoodDash file and replace the operations. It takes every expected value from `tests.json` and never computes one.
 6. **Add npm scripts** for your folder next to the FoodDash ones in `package.json`.
-7. **Prove it**: `node lib/check-card.mjs examples/<product>/fact-card.json`, two generator runs with the same sha256, then the run.
+7. **Prove it**: `node lib/check-card.mjs examples/<product>/fact-card.json`, the analyst's `node lib/approve.mjs examples/<product>/fact-card.json "<name>"`, two generator runs with the same sha256, then the run.
 
 ## Keep these properties
 
@@ -36,6 +36,7 @@ Three layers. Two you keep, one you write.
 - **Amounts as integers** in the smallest unit.
 - **An unreachable value is reported, not dropped**: when the product cannot build a boundary value, take the nearest one on the same side and say so in `tests.md`.
 - **A missing result is a question**: when a decision-table rule has no expected result on the card, write a blocked test that names the question.
+- **Nothing the binding does not know becomes a test**: a transition without steps, a rule without a formula or a test without a check stops the generator with a message. An empty test that passes is worse than no test.
 
 ## When it does not fit
 
