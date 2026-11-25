@@ -55,7 +55,7 @@ fact, what was checked, what the spec demands and what the app did.
 
 | Step | Who does it | What comes out | Command or skill |
 | --- | --- | --- | --- |
-| 1. Spec | product team | [`spec/`](examples/fooddash/spec/README.md): 11 user stories in two documents | given |
+| 1. Spec | product team | [`spec/`](examples/fooddash/spec/README.md): 11 user stories in two documents; the example covers 6 of them | given |
 | 2. Fact card | AI agent drafts, code checks every quote, analyst approves | [`fact-card.json`](examples/fooddash/fact-card.json): 10 facts, 4 open questions | skills `extract-facts`, `review-fact-card` · `npm run check-card`, `npm run approve` |
 | 3. Techniques | code, picked by the fact type | boundary values, decision table, state transitions, each choice | [`lib/techniques.mjs`](lib/techniques.mjs) |
 | 4. Tests | code computes data and expected results | [`tests.md`](examples/fooddash/tests.md), `tests.json`: 23 tests | skill `generate-tests` · `npm run generate` |
@@ -155,6 +155,10 @@ minute) or `npm run tests battle`, `npm run apps` (click through the app on port
 
 ## Limits of the example
 
+- **6 of the 11 stories are covered.** The fact card takes the money and order flow: cart (FD-05), checkout (FD-06),
+  confirmation and tracking (FD-07), promo code (FD-09), minimum order (FD-10) and favourites (FD-11). Search and
+  filter (FD-02), dish options (FD-04) and the 404 page (FD-08) have no facts and no tests, on purpose: pick a
+  slice whose rules are limits, tables and lifecycles first.
 - **One binding, one product.** `lib/` is generic. `examples/fooddash/generate.mjs` knows FoodDash: it has steps for
   the transitions on this card and prices for this one decision table. A transition or a rule it does not know stops
   the generator with a message, it never produces an empty test. Answering open question Q1, for example, needs the
