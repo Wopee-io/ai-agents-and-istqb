@@ -1,0 +1,2056 @@
+{
+  "generator": "generate.mjs",
+  "cardSha256": "c9581f4d7057ff2f573d117d04f1a6cb4685124dfbdfc8f8aacd8c3f62dcc7fb",
+  "counts": {
+    "total": 23,
+    "ready": 22,
+    "blocked": 1,
+    "byTechnique": {
+      "boundary values (3-value)": 7,
+      "decision table": 3,
+      "each parameter value": 1,
+      "state transitions": 12
+    },
+    "perBuild": {
+      "learn": 9,
+      "battle": 22,
+      "bug": 9
+    }
+  },
+  "boundaryValues": [
+    {
+      "fact": "F04",
+      "restaurant": "Burger Palace",
+      "boundary": "$25.00",
+      "rule": "discount when subtotal > $25",
+      "points": [
+        {
+          "requested": "$24.99",
+          "side": "no discount",
+          "reachable": null,
+          "used": "$24.98"
+        },
+        {
+          "requested": "$25.00",
+          "side": "no discount",
+          "reachable": null,
+          "used": "$24.98"
+        },
+        {
+          "requested": "$25.01",
+          "side": "discount applies",
+          "reachable": null,
+          "used": "$25.45"
+        }
+      ],
+      "note": "A value the menu cannot build is replaced by the nearest cart on the same side of the boundary. Above the boundary, only carts where 20% comes out in whole cents (Q4)."
+    },
+    {
+      "fact": "F09",
+      "restaurant": "Sushi Masters",
+      "boundary": "$20.00",
+      "rule": "checkout when food subtotal ≥ $20.00",
+      "points": [
+        {
+          "requested": "$19.99",
+          "side": "checkout blocked",
+          "reachable": null,
+          "used": "$19.98"
+        },
+        {
+          "requested": "$20.00",
+          "side": "checkout allowed",
+          "reachable": null,
+          "used": "$20.97"
+        },
+        {
+          "requested": "$20.01",
+          "side": "checkout allowed",
+          "reachable": null,
+          "used": "$20.97"
+        }
+      ],
+      "note": "The menu cannot build $19.99, $20.00, $20.01. The code takes the nearest carts on both sides."
+    },
+    {
+      "fact": "F06",
+      "restaurant": "(picked by the code: smallest cart with no other discount)",
+      "boundary": "half a cent",
+      "rule": "round to cents, halves up",
+      "points": [
+        {
+          "requested": "third decimal 4",
+          "side": "down",
+          "reachable": true,
+          "used": "$16.94 → $1.694 → $1.69"
+        },
+        {
+          "requested": "third decimal 5",
+          "side": "up",
+          "reachable": true,
+          "used": "$12.95 → $1.295 → $1.30"
+        },
+        {
+          "requested": "third decimal 6",
+          "side": "up",
+          "reachable": true,
+          "used": "$15.96 → $1.596 → $1.60"
+        }
+      ],
+      "note": "Rounding boundary: x.xx4 down, x.xx5 up, x.xx6 up."
+    }
+  ],
+  "decisionTable": [
+    {
+      "rule": "R1",
+      "20% discount applies": "yes",
+      "LEARN10 applied": "yes",
+      "minimum order": "none",
+      "result": "question Q1",
+      "test": "RT-01"
+    },
+    {
+      "rule": "R2",
+      "20% discount applies": "yes",
+      "LEARN10 applied": "yes",
+      "minimum order": "met",
+      "result": "not possible",
+      "why": "no restaurant in the data has both the 20% discount and a minimum"
+    },
+    {
+      "rule": "R3",
+      "20% discount applies": "yes",
+      "LEARN10 applied": "yes",
+      "minimum order": "not met",
+      "result": "not possible",
+      "why": "no restaurant in the data has both the 20% discount and a minimum"
+    },
+    {
+      "rule": "R4",
+      "20% discount applies": "yes",
+      "LEARN10 applied": "no",
+      "minimum order": "none",
+      "result": "covered",
+      "test": "HH-02"
+    },
+    {
+      "rule": "R5",
+      "20% discount applies": "yes",
+      "LEARN10 applied": "no",
+      "minimum order": "met",
+      "result": "not possible",
+      "why": "no restaurant in the data has both the 20% discount and a minimum"
+    },
+    {
+      "rule": "R6",
+      "20% discount applies": "yes",
+      "LEARN10 applied": "no",
+      "minimum order": "not met",
+      "result": "not possible",
+      "why": "no restaurant in the data has both the 20% discount and a minimum"
+    },
+    {
+      "rule": "R7",
+      "20% discount applies": "no",
+      "LEARN10 applied": "yes",
+      "minimum order": "none",
+      "result": "covered",
+      "test": "HH-06"
+    },
+    {
+      "rule": "R8",
+      "20% discount applies": "no",
+      "LEARN10 applied": "yes",
+      "minimum order": "met",
+      "result": "new test",
+      "test": "RT-02"
+    },
+    {
+      "rule": "R9",
+      "20% discount applies": "no",
+      "LEARN10 applied": "yes",
+      "minimum order": "not met",
+      "result": "new test",
+      "test": "RT-03"
+    },
+    {
+      "rule": "R10",
+      "20% discount applies": "no",
+      "LEARN10 applied": "no",
+      "minimum order": "none",
+      "result": "covered",
+      "test": "HH-01"
+    },
+    {
+      "rule": "R11",
+      "20% discount applies": "no",
+      "LEARN10 applied": "no",
+      "minimum order": "met",
+      "result": "covered",
+      "test": "HH-04"
+    },
+    {
+      "rule": "R12",
+      "20% discount applies": "no",
+      "LEARN10 applied": "no",
+      "minimum order": "not met",
+      "result": "covered",
+      "test": "HH-03"
+    }
+  ],
+  "parameterValues": [
+    {
+      "fact": "F01",
+      "value": "$2.99",
+      "coveredBy": "HH-01"
+    },
+    {
+      "fact": "F01",
+      "value": "Free ($0.00)",
+      "coveredBy": "PK-01"
+    },
+    {
+      "fact": "F01",
+      "value": "$1.99",
+      "coveredBy": "RT-02"
+    }
+  ],
+  "stateTransitions": [
+    {
+      "fact": "F07",
+      "test": "PS-01",
+      "covers": [
+        "p1",
+        "p2",
+        "p3",
+        "p4"
+      ]
+    },
+    {
+      "fact": "F08",
+      "test": "PS-02",
+      "covers": [
+        "o1",
+        "o2",
+        "o3",
+        "o4",
+        "o5",
+        "o6",
+        "o7",
+        "x4"
+      ]
+    },
+    {
+      "fact": "F08",
+      "test": "PS-03",
+      "covers": [
+        "o1",
+        "o8"
+      ]
+    },
+    {
+      "fact": "F08",
+      "test": "PS-04",
+      "covers": [
+        "o1",
+        "o9"
+      ]
+    },
+    {
+      "fact": "F08",
+      "test": "PS-05",
+      "covers": [
+        "x1"
+      ],
+      "forbidden": true
+    },
+    {
+      "fact": "F08",
+      "test": "PS-06",
+      "covers": [
+        "x2"
+      ],
+      "forbidden": true
+    },
+    {
+      "fact": "F08",
+      "test": "PS-07",
+      "covers": [
+        "x3"
+      ],
+      "forbidden": true
+    },
+    {
+      "fact": "F10",
+      "test": "PS-08",
+      "covers": [
+        "f1",
+        "f2",
+        "f3"
+      ]
+    },
+    {
+      "fact": "F10",
+      "test": "PS-09",
+      "covers": [
+        "f1",
+        "f2",
+        "f3"
+      ]
+    },
+    {
+      "fact": "F10",
+      "test": "PS-10",
+      "covers": [
+        "f1",
+        "f2",
+        "f3"
+      ]
+    },
+    {
+      "fact": "F10",
+      "test": "PS-11",
+      "covers": [
+        "f1",
+        "f2",
+        "f3"
+      ]
+    },
+    {
+      "fact": "F10",
+      "test": "PS-12",
+      "covers": [
+        "f1",
+        "f2",
+        "f3"
+      ]
+    }
+  ],
+  "openQuestions": [
+    {
+      "id": "Q1",
+      "facts": [
+        "F04",
+        "F05"
+      ],
+      "question": "Does the 20% restaurant discount (over $25) stack with the code LEARN10? If so, in what order, and is the $25 boundary checked before or after the code discount?",
+      "why": "Decision table: the spec gives no result for the combination \"restaurant discount applies × LEARN10 applied\".",
+      "status": "open: the spec is silent, question for the analyst"
+    },
+    {
+      "id": "Q2",
+      "facts": [
+        "F04"
+      ],
+      "question": "Does the 20% discount also apply to an order of exactly $25.00? The text says \"over $25\" and \"once it passes $25\", so the card uses \"more than $25\".",
+      "why": "This is the value exactly on the boundary. Also, $25.00 cannot be built from the Burger Palace menu, so there is no test on the boundary yet.",
+      "status": "reading to confirm"
+    },
+    {
+      "id": "Q3",
+      "facts": [
+        "F04"
+      ],
+      "question": "What do the offers \"20% off your first order\" (Koliba u Jána) and \"Free dessert with orders over $30\" (Mediterranean Delight) mean? The spec only defines \"20% OFF orders over $25\". A \"first order\" makes no sense without an account.",
+      "why": "The app shows them on the cards, but there is no rule for them. The generator leaves these restaurants out of the price tests.",
+      "status": "open"
+    },
+    {
+      "id": "Q4",
+      "facts": [
+        "F04"
+      ],
+      "question": "How is the 20% restaurant discount rounded? The spec gives the \"halves up\" rule only for LEARN10.",
+      "why": "So for the 20% discount the generator only picks carts where the discount comes out in whole cents.",
+      "status": "open"
+    }
+  ],
+  "tests": [
+    {
+      "id": "HH-01",
+      "title": "20% discount: cart below the $25 boundary ($24.98)",
+      "techniques": [
+        "boundary values (3-value)",
+        "decision table (R10)"
+      ],
+      "facts": [
+        "F04"
+      ],
+      "stories": [
+        "FD-05"
+      ],
+      "builds": [
+        "learn",
+        "battle",
+        "bug"
+      ],
+      "status": "ready",
+      "data": {
+        "restaurant": "Burger Palace",
+        "items": [
+          [
+            "Double Smash Burger",
+            1
+          ],
+          [
+            "Truffle Fries",
+            1
+          ]
+        ],
+        "code": null
+      },
+      "steps": [
+        "Open the restaurant Burger Palace.",
+        "Add 1× Double Smash Burger (Burgers tab).",
+        "Add 1× Truffle Fries (Sides tab).",
+        "Open the cart."
+      ],
+      "expected": "No discount. Subtotal $24.98, Delivery Fee $2.99, Service Fee $1.50, no discount, Total $29.47",
+      "plan": [
+        {
+          "op": "openRestaurant",
+          "restaurant": "Burger Palace"
+        },
+        {
+          "op": "add",
+          "item": "Double Smash Burger",
+          "qty": 1,
+          "category": "Burgers"
+        },
+        {
+          "op": "add",
+          "item": "Truffle Fries",
+          "qty": 1,
+          "category": "Sides"
+        },
+        {
+          "op": "openCart"
+        },
+        {
+          "op": "expectSummary",
+          "scope": "cart",
+          "lines": {
+            "Subtotal": 2498,
+            "Delivery Fee": 299,
+            "Service Fee": 150,
+            "Total": 2947
+          },
+          "discount": null,
+          "facts": {
+            "Subtotal": "F03",
+            "Delivery Fee": "F01",
+            "Service Fee": "F02",
+            "Total": "F03",
+            "discount": "F04"
+          }
+        }
+      ]
+    },
+    {
+      "id": "HH-02",
+      "title": "20% discount: cart above the $25 boundary ($25.45)",
+      "techniques": [
+        "boundary values (3-value)",
+        "decision table (R4)"
+      ],
+      "facts": [
+        "F04"
+      ],
+      "stories": [
+        "FD-05"
+      ],
+      "builds": [
+        "learn",
+        "battle",
+        "bug"
+      ],
+      "status": "ready",
+      "data": {
+        "restaurant": "Burger Palace",
+        "items": [
+          [
+            "Onion Rings",
+            1
+          ],
+          [
+            "Classic Lemonade",
+            3
+          ],
+          [
+            "Milkshake",
+            1
+          ]
+        ],
+        "code": null
+      },
+      "steps": [
+        "Open the restaurant Burger Palace.",
+        "Add 1× Onion Rings (Sides tab).",
+        "Add 3× Classic Lemonade (Drinks tab).",
+        "Add 1× Milkshake (Drinks tab).",
+        "Open the cart."
+      ],
+      "expected": "Restaurant discount −$5.09 (20% of $25.45). Subtotal $25.45, Delivery Fee $2.99, Service Fee $1.50, restaurant discount 20% −$5.09, Total $24.85",
+      "plan": [
+        {
+          "op": "openRestaurant",
+          "restaurant": "Burger Palace"
+        },
+        {
+          "op": "add",
+          "item": "Onion Rings",
+          "qty": 1,
+          "category": "Sides"
+        },
+        {
+          "op": "add",
+          "item": "Classic Lemonade",
+          "qty": 3,
+          "category": "Drinks"
+        },
+        {
+          "op": "add",
+          "item": "Milkshake",
+          "qty": 1,
+          "category": "Drinks"
+        },
+        {
+          "op": "openCart"
+        },
+        {
+          "op": "expectSummary",
+          "scope": "cart",
+          "lines": {
+            "Subtotal": 2545,
+            "Delivery Fee": 299,
+            "Service Fee": 150,
+            "Total": 2485
+          },
+          "discount": {
+            "kind": "restaurant",
+            "amount": 509
+          },
+          "facts": {
+            "Subtotal": "F03",
+            "Delivery Fee": "F01",
+            "Service Fee": "F02",
+            "Total": "F03",
+            "discount": "F04"
+          }
+        }
+      ]
+    },
+    {
+      "id": "HH-03",
+      "title": "Minimum order $20: cart just below the boundary ($19.98)",
+      "techniques": [
+        "boundary values (3-value)",
+        "decision table (R12)"
+      ],
+      "facts": [
+        "F09"
+      ],
+      "stories": [
+        "FD-10"
+      ],
+      "builds": [
+        "battle"
+      ],
+      "status": "ready",
+      "data": {
+        "restaurant": "Sushi Masters",
+        "items": [
+          [
+            "California Roll",
+            1
+          ],
+          [
+            "Tuna Nigiri (2pc)",
+            1
+          ]
+        ],
+        "code": null
+      },
+      "steps": [
+        "Open the restaurant Sushi Masters.",
+        "Add 1× California Roll (Sushi Rolls tab).",
+        "Add 1× Tuna Nigiri (2pc) (Nigiri tab).",
+        "Open the cart."
+      ],
+      "expected": "The cart shows \"Add $0.02 more to order from Sushi Masters\" (the gap to the food subtotal; fees do not count) and offers no Proceed to Checkout.",
+      "plan": [
+        {
+          "op": "openRestaurant",
+          "restaurant": "Sushi Masters"
+        },
+        {
+          "op": "add",
+          "item": "California Roll",
+          "qty": 1,
+          "category": "Sushi Rolls"
+        },
+        {
+          "op": "add",
+          "item": "Tuna Nigiri (2pc)",
+          "qty": 1,
+          "category": "Nigiri"
+        },
+        {
+          "op": "openCart"
+        },
+        {
+          "op": "expectText",
+          "text": "Add $0.02 more to order from Sushi Masters",
+          "fact": "F09"
+        },
+        {
+          "op": "expectButton",
+          "name": "Proceed to Checkout",
+          "present": false,
+          "fact": "F09"
+        }
+      ]
+    },
+    {
+      "id": "HH-04",
+      "title": "Minimum order $20: cart above the boundary ($20.97)",
+      "techniques": [
+        "boundary values (3-value)",
+        "decision table (R11)"
+      ],
+      "facts": [
+        "F09"
+      ],
+      "stories": [
+        "FD-10"
+      ],
+      "builds": [
+        "battle"
+      ],
+      "status": "ready",
+      "data": {
+        "restaurant": "Sushi Masters",
+        "items": [
+          [
+            "Salmon Nigiri (2pc)",
+            3
+          ]
+        ],
+        "code": null
+      },
+      "steps": [
+        "Open the restaurant Sushi Masters.",
+        "Add 3× Salmon Nigiri (2pc) (Nigiri tab).",
+        "Open the cart.",
+        "Proceed to Checkout."
+      ],
+      "expected": "No minimum message. Proceed to Checkout is there and checkout shows the form.",
+      "plan": [
+        {
+          "op": "openRestaurant",
+          "restaurant": "Sushi Masters"
+        },
+        {
+          "op": "add",
+          "item": "Salmon Nigiri (2pc)",
+          "qty": 3,
+          "category": "Nigiri"
+        },
+        {
+          "op": "openCart"
+        },
+        {
+          "op": "expectNoText",
+          "text": "more to order from",
+          "fact": "F09"
+        },
+        {
+          "op": "expectButton",
+          "name": "Proceed to Checkout",
+          "present": true,
+          "fact": "F09"
+        },
+        {
+          "op": "proceedToCheckout"
+        },
+        {
+          "op": "expectButton",
+          "name": "Place Order",
+          "present": true,
+          "fact": "F09"
+        }
+      ]
+    },
+    {
+      "id": "HH-05",
+      "title": "LEARN10 rounding: 10% of $16.94 = $1.694 → $1.69 (down)",
+      "techniques": [
+        "boundary values (3-value)"
+      ],
+      "facts": [
+        "F05",
+        "F06"
+      ],
+      "stories": [
+        "FD-09"
+      ],
+      "builds": [
+        "battle"
+      ],
+      "status": "ready",
+      "data": {
+        "restaurant": "Burger Palace",
+        "items": [
+          [
+            "Classic Beef Burger",
+            1
+          ],
+          [
+            "Classic Lemonade",
+            1
+          ]
+        ],
+        "code": "LEARN10"
+      },
+      "steps": [
+        "Open the restaurant Burger Palace.",
+        "Add 1× Classic Beef Burger (Burgers tab).",
+        "Add 1× Classic Lemonade (Drinks tab).",
+        "Open the cart.",
+        "Proceed to Checkout.",
+        "Enter the code LEARN10 and click Apply."
+      ],
+      "expected": "Promo LEARN10 line −$1.69. Subtotal $16.94, Delivery Fee $2.99, Service Fee $1.50, Promo LEARN10 −$1.69, Total $19.74",
+      "plan": [
+        {
+          "op": "openRestaurant",
+          "restaurant": "Burger Palace"
+        },
+        {
+          "op": "add",
+          "item": "Classic Beef Burger",
+          "qty": 1,
+          "category": "Burgers"
+        },
+        {
+          "op": "add",
+          "item": "Classic Lemonade",
+          "qty": 1,
+          "category": "Drinks"
+        },
+        {
+          "op": "openCart"
+        },
+        {
+          "op": "proceedToCheckout"
+        },
+        {
+          "op": "applyCode",
+          "code": "LEARN10"
+        },
+        {
+          "op": "expectSummary",
+          "scope": "checkout",
+          "lines": {
+            "Subtotal": 1694,
+            "Delivery Fee": 299,
+            "Service Fee": 150,
+            "Total": 1974
+          },
+          "discount": {
+            "kind": "LEARN10",
+            "amount": 169
+          },
+          "facts": {
+            "Subtotal": "F03",
+            "Delivery Fee": "F01",
+            "Service Fee": "F02",
+            "Total": "F03",
+            "discount": "F06"
+          }
+        }
+      ]
+    },
+    {
+      "id": "HH-06",
+      "title": "LEARN10 rounding: 10% of $12.95 = $1.295 → $1.30 (up)",
+      "techniques": [
+        "boundary values (3-value)",
+        "decision table (R7)"
+      ],
+      "facts": [
+        "F05",
+        "F06",
+        "F04"
+      ],
+      "stories": [
+        "FD-09"
+      ],
+      "builds": [
+        "battle"
+      ],
+      "status": "ready",
+      "data": {
+        "restaurant": "Burger Palace",
+        "items": [
+          [
+            "Classic Beef Burger",
+            1
+          ]
+        ],
+        "code": "LEARN10"
+      },
+      "steps": [
+        "Open the restaurant Burger Palace.",
+        "Add 1× Classic Beef Burger (Burgers tab).",
+        "Open the cart.",
+        "Proceed to Checkout.",
+        "Enter the code LEARN10 and click Apply."
+      ],
+      "expected": "Promo LEARN10 line −$1.30. Subtotal $12.95, Delivery Fee $2.99, Service Fee $1.50, Promo LEARN10 −$1.30, Total $16.14",
+      "plan": [
+        {
+          "op": "openRestaurant",
+          "restaurant": "Burger Palace"
+        },
+        {
+          "op": "add",
+          "item": "Classic Beef Burger",
+          "qty": 1,
+          "category": "Burgers"
+        },
+        {
+          "op": "openCart"
+        },
+        {
+          "op": "proceedToCheckout"
+        },
+        {
+          "op": "applyCode",
+          "code": "LEARN10"
+        },
+        {
+          "op": "expectSummary",
+          "scope": "checkout",
+          "lines": {
+            "Subtotal": 1295,
+            "Delivery Fee": 299,
+            "Service Fee": 150,
+            "Total": 1614
+          },
+          "discount": {
+            "kind": "LEARN10",
+            "amount": 130
+          },
+          "facts": {
+            "Subtotal": "F03",
+            "Delivery Fee": "F01",
+            "Service Fee": "F02",
+            "Total": "F03",
+            "discount": "F06"
+          }
+        }
+      ]
+    },
+    {
+      "id": "HH-07",
+      "title": "LEARN10 rounding: 10% of $15.96 = $1.596 → $1.60 (up)",
+      "techniques": [
+        "boundary values (3-value)"
+      ],
+      "facts": [
+        "F05",
+        "F06"
+      ],
+      "stories": [
+        "FD-09"
+      ],
+      "builds": [
+        "battle"
+      ],
+      "status": "ready",
+      "data": {
+        "restaurant": "Burger Palace",
+        "items": [
+          [
+            "Classic Lemonade",
+            4
+          ]
+        ],
+        "code": "LEARN10"
+      },
+      "steps": [
+        "Open the restaurant Burger Palace.",
+        "Add 4× Classic Lemonade (Drinks tab).",
+        "Open the cart.",
+        "Proceed to Checkout.",
+        "Enter the code LEARN10 and click Apply."
+      ],
+      "expected": "Promo LEARN10 line −$1.60. Subtotal $15.96, Delivery Fee $2.99, Service Fee $1.50, Promo LEARN10 −$1.60, Total $18.85",
+      "plan": [
+        {
+          "op": "openRestaurant",
+          "restaurant": "Burger Palace"
+        },
+        {
+          "op": "add",
+          "item": "Classic Lemonade",
+          "qty": 4,
+          "category": "Drinks"
+        },
+        {
+          "op": "openCart"
+        },
+        {
+          "op": "proceedToCheckout"
+        },
+        {
+          "op": "applyCode",
+          "code": "LEARN10"
+        },
+        {
+          "op": "expectSummary",
+          "scope": "checkout",
+          "lines": {
+            "Subtotal": 1596,
+            "Delivery Fee": 299,
+            "Service Fee": 150,
+            "Total": 1885
+          },
+          "discount": {
+            "kind": "LEARN10",
+            "amount": 160
+          },
+          "facts": {
+            "Subtotal": "F03",
+            "Delivery Fee": "F01",
+            "Service Fee": "F02",
+            "Total": "F03",
+            "discount": "F06"
+          }
+        }
+      ]
+    },
+    {
+      "id": "RT-01",
+      "title": "20% discount and LEARN10 together: the spec is silent",
+      "techniques": [
+        "decision table"
+      ],
+      "facts": [
+        "F04",
+        "F05"
+      ],
+      "stories": [
+        "FD-05",
+        "FD-09"
+      ],
+      "builds": [],
+      "status": "blocked",
+      "data": {
+        "restaurant": "Burger Palace",
+        "items": null,
+        "code": "LEARN10"
+      },
+      "steps": [
+        "No test until the analyst answers Q1."
+      ],
+      "expected": "Unknown: Does the 20% restaurant discount (over $25) stack with the code LEARN10? If so, in what order, and is the $25 boundary checked before or after the code discount?",
+      "plan": [],
+      "question": "Q1"
+    },
+    {
+      "id": "RT-02",
+      "title": "Sushi Masters above the minimum + LEARN10",
+      "techniques": [
+        "decision table (R8)"
+      ],
+      "facts": [
+        "F05",
+        "F09"
+      ],
+      "stories": [
+        "FD-09",
+        "FD-10"
+      ],
+      "builds": [
+        "battle"
+      ],
+      "status": "ready",
+      "data": {
+        "restaurant": "Sushi Masters",
+        "items": [
+          [
+            "Salmon Nigiri (2pc)",
+            3
+          ]
+        ],
+        "code": "LEARN10"
+      },
+      "steps": [
+        "Open the restaurant Sushi Masters.",
+        "Add 3× Salmon Nigiri (2pc) (Nigiri tab).",
+        "Open the cart.",
+        "Proceed to Checkout.",
+        "Enter the code LEARN10 and click Apply."
+      ],
+      "expected": "Subtotal $20.97, Delivery Fee $1.99, Service Fee $1.50, Promo LEARN10 −$2.10, Total $22.36. The minimum uses the food subtotal, so checkout works.",
+      "plan": [
+        {
+          "op": "openRestaurant",
+          "restaurant": "Sushi Masters"
+        },
+        {
+          "op": "add",
+          "item": "Salmon Nigiri (2pc)",
+          "qty": 3,
+          "category": "Nigiri"
+        },
+        {
+          "op": "openCart"
+        },
+        {
+          "op": "proceedToCheckout"
+        },
+        {
+          "op": "applyCode",
+          "code": "LEARN10"
+        },
+        {
+          "op": "expectSummary",
+          "scope": "checkout",
+          "lines": {
+            "Subtotal": 2097,
+            "Delivery Fee": 199,
+            "Service Fee": 150,
+            "Total": 2236
+          },
+          "discount": {
+            "kind": "LEARN10",
+            "amount": 210
+          },
+          "facts": {
+            "Subtotal": "F03",
+            "Delivery Fee": "F01",
+            "Service Fee": "F02",
+            "Total": "F03",
+            "discount": "F05"
+          }
+        },
+        {
+          "op": "expectButton",
+          "name": "Place Order",
+          "present": true,
+          "fact": "F09"
+        }
+      ]
+    },
+    {
+      "id": "RT-03",
+      "title": "Sushi Masters below the minimum + LEARN10: checkout shows a message instead of the form",
+      "techniques": [
+        "decision table (R9)"
+      ],
+      "facts": [
+        "F05",
+        "F09"
+      ],
+      "stories": [
+        "FD-09",
+        "FD-10"
+      ],
+      "builds": [
+        "battle"
+      ],
+      "status": "ready",
+      "data": {
+        "restaurant": "Sushi Masters",
+        "items": [
+          [
+            "California Roll",
+            1
+          ],
+          [
+            "Tuna Nigiri (2pc)",
+            1
+          ]
+        ],
+        "code": "LEARN10"
+      },
+      "steps": [
+        "Open the restaurant Sushi Masters.",
+        "Add 1× California Roll (Sushi Rolls tab).",
+        "Add 1× Tuna Nigiri (2pc) (Nigiri tab).",
+        "Open the cart.",
+        "Go to /checkout inside the app, without a button."
+      ],
+      "expected": "Checkout shows \"Add $0.02 more to order from Sushi Masters\" instead of the form. There is no form and no code field, so the code cannot be applied.",
+      "plan": [
+        {
+          "op": "openRestaurant",
+          "restaurant": "Sushi Masters"
+        },
+        {
+          "op": "add",
+          "item": "California Roll",
+          "qty": 1,
+          "category": "Sushi Rolls"
+        },
+        {
+          "op": "add",
+          "item": "Tuna Nigiri (2pc)",
+          "qty": 1,
+          "category": "Nigiri"
+        },
+        {
+          "op": "openCart"
+        },
+        {
+          "op": "appNavigate",
+          "path": "/checkout"
+        },
+        {
+          "op": "expectText",
+          "text": "Add $0.02 more to order from Sushi Masters",
+          "fact": "F09"
+        },
+        {
+          "op": "expectButton",
+          "name": "Place Order",
+          "present": false,
+          "fact": "F09"
+        },
+        {
+          "op": "expectField",
+          "name": "Promo code",
+          "present": false,
+          "fact": "F09"
+        }
+      ]
+    },
+    {
+      "id": "PK-01",
+      "title": "Delivery \"Free\" counts as $0.00 (Pizza Corner)",
+      "techniques": [
+        "each parameter value"
+      ],
+      "facts": [
+        "F01"
+      ],
+      "stories": [
+        "FD-05"
+      ],
+      "builds": [
+        "learn",
+        "battle",
+        "bug"
+      ],
+      "status": "ready",
+      "data": {
+        "restaurant": "Pizza Corner",
+        "items": [
+          [
+            "Panna Cotta",
+            1
+          ]
+        ],
+        "code": null
+      },
+      "steps": [
+        "Open the restaurant Pizza Corner.",
+        "Add 1× Panna Cotta (Desserts tab).",
+        "Open the cart."
+      ],
+      "expected": "Subtotal $7.99, Delivery Fee $0.00, Service Fee $1.50, no discount, Total $9.49",
+      "plan": [
+        {
+          "op": "openRestaurant",
+          "restaurant": "Pizza Corner"
+        },
+        {
+          "op": "add",
+          "item": "Panna Cotta",
+          "qty": 1,
+          "category": "Desserts"
+        },
+        {
+          "op": "openCart"
+        },
+        {
+          "op": "expectSummary",
+          "scope": "cart",
+          "lines": {
+            "Subtotal": 799,
+            "Delivery Fee": 0,
+            "Service Fee": 150,
+            "Total": 949
+          },
+          "discount": null,
+          "facts": {
+            "Subtotal": "F03",
+            "Delivery Fee": "F01",
+            "Service Fee": "F02",
+            "Total": "F03",
+            "discount": "F01"
+          }
+        }
+      ]
+    },
+    {
+      "id": "PS-01",
+      "title": "Promo code: apply with an unknown code → apply with the code in lower case → apply again → remove",
+      "techniques": [
+        "state transitions"
+      ],
+      "facts": [
+        "F05",
+        "F07"
+      ],
+      "stories": [
+        "FD-09"
+      ],
+      "builds": [
+        "battle"
+      ],
+      "status": "ready",
+      "data": {
+        "restaurant": "Burger Palace",
+        "items": [
+          [
+            "Classic Beef Burger",
+            1
+          ]
+        ],
+        "code": "LEARN11, learn10, LEARN10"
+      },
+      "steps": [
+        "Open the restaurant Burger Palace.",
+        "Add 1× Classic Beef Burger (Burgers tab).",
+        "Open the cart.",
+        "Proceed to Checkout.",
+        "Enter the code LEARN11 and click Apply.",
+        "Enter the code learn10 and click Apply.",
+        "Enter the code LEARN10 and click Apply.",
+        "Remove the code (Remove)."
+      ],
+      "expected": "Unknown code: \"This code is not valid\", no discount. learn10: one discount −$1.30, Total $16.14. Second Apply: still one discount. Remove: no discount, Total $17.44.",
+      "plan": [
+        {
+          "op": "openRestaurant",
+          "restaurant": "Burger Palace"
+        },
+        {
+          "op": "add",
+          "item": "Classic Beef Burger",
+          "qty": 1,
+          "category": "Burgers"
+        },
+        {
+          "op": "openCart"
+        },
+        {
+          "op": "proceedToCheckout"
+        },
+        {
+          "op": "applyCode",
+          "code": "LEARN11"
+        },
+        {
+          "op": "expectText",
+          "text": "This code is not valid",
+          "fact": "F07"
+        },
+        {
+          "op": "expectDiscountCount",
+          "count": 0,
+          "fact": "F07"
+        },
+        {
+          "op": "applyCode",
+          "code": "learn10"
+        },
+        {
+          "op": "expectDiscountCount",
+          "count": 1,
+          "fact": "F07"
+        },
+        {
+          "op": "expectSummary",
+          "scope": "checkout",
+          "lines": {
+            "Subtotal": 1295,
+            "Delivery Fee": 299,
+            "Service Fee": 150,
+            "Total": 1614
+          },
+          "discount": {
+            "kind": "LEARN10",
+            "amount": 130
+          },
+          "facts": {
+            "Subtotal": "F03",
+            "Delivery Fee": "F01",
+            "Service Fee": "F02",
+            "Total": "F03",
+            "discount": "F05"
+          }
+        },
+        {
+          "op": "applyCode",
+          "code": "LEARN10",
+          "mayBeDisabled": true
+        },
+        {
+          "op": "expectDiscountCount",
+          "count": 1,
+          "fact": "F07"
+        },
+        {
+          "op": "removeCode"
+        },
+        {
+          "op": "expectDiscountCount",
+          "count": 0,
+          "fact": "F07"
+        },
+        {
+          "op": "expectLine",
+          "line": "Total",
+          "amount": 1744,
+          "fact": "F07"
+        }
+      ]
+    },
+    {
+      "id": "PS-02",
+      "title": "The order goes through all five stages in order and never leaves Delivered",
+      "techniques": [
+        "state transitions"
+      ],
+      "facts": [
+        "F08",
+        "F03"
+      ],
+      "stories": [
+        "FD-05",
+        "FD-06",
+        "FD-07"
+      ],
+      "builds": [
+        "learn",
+        "battle",
+        "bug"
+      ],
+      "status": "ready",
+      "data": {
+        "restaurant": "Burger Palace",
+        "items": [
+          [
+            "Classic Beef Burger",
+            1
+          ]
+        ],
+        "code": null
+      },
+      "steps": [
+        "Speed up time (test clock).",
+        "Open the restaurant Burger Palace.",
+        "Add 1× Classic Beef Burger (Burgers tab).",
+        "Open the cart.",
+        "Proceed to Checkout.",
+        "Fill in all required fields.",
+        "Place Order.",
+        "Track My Order."
+      ],
+      "expected": "Order Confirmed!, order number ^FDR-[A-Z0-9]{6}$, Total $17.44. Tracking shows Total Paid $17.44 and the stages Order Confirmed → Preparing → Ready for Pickup → On the Way → Delivered in this order, none skipped, no going back.",
+      "plan": [
+        {
+          "op": "installClock"
+        },
+        {
+          "op": "openRestaurant",
+          "restaurant": "Burger Palace"
+        },
+        {
+          "op": "add",
+          "item": "Classic Beef Burger",
+          "qty": 1,
+          "category": "Burgers"
+        },
+        {
+          "op": "openCart"
+        },
+        {
+          "op": "proceedToCheckout"
+        },
+        {
+          "op": "fillDelivery",
+          "fields": {
+            "Full Name": "Jane Tester",
+            "Street Address": "1 Test Street",
+            "City": "Prague",
+            "Phone Number": "+420 600 000 000"
+          }
+        },
+        {
+          "op": "placeOrder"
+        },
+        {
+          "op": "expectConfirmation",
+          "pattern": "^FDR-[A-Z0-9]{6}$",
+          "total": 1744,
+          "fact": "F08"
+        },
+        {
+          "op": "trackOrder"
+        },
+        {
+          "op": "expectLine",
+          "line": "Total Paid",
+          "amount": 1744,
+          "fact": "F03"
+        },
+        {
+          "op": "expectStages",
+          "stages": [
+            "Order Confirmed",
+            "Preparing",
+            "Ready for Pickup",
+            "On the Way",
+            "Delivered"
+          ],
+          "fact": "F08"
+        },
+        {
+          "op": "expectStaysAt",
+          "stage": "Delivered",
+          "fact": "F08"
+        }
+      ]
+    },
+    {
+      "id": "PS-03",
+      "title": "Cart: add food → remove the last item",
+      "techniques": [
+        "state transitions"
+      ],
+      "facts": [
+        "F08"
+      ],
+      "stories": [
+        "FD-05",
+        "FD-06",
+        "FD-07"
+      ],
+      "builds": [
+        "learn",
+        "battle",
+        "bug"
+      ],
+      "status": "ready",
+      "data": {
+        "restaurant": "Burger Palace",
+        "items": [
+          [
+            "Classic Beef Burger",
+            1
+          ]
+        ],
+        "code": null
+      },
+      "steps": [
+        "Open the restaurant Burger Palace.",
+        "Add 1× Classic Beef Burger (Burgers tab).",
+        "Open the cart.",
+        "Remove Classic Beef Burger from the cart."
+      ],
+      "expected": "An empty cart offers no Proceed to Checkout.",
+      "plan": [
+        {
+          "op": "openRestaurant",
+          "restaurant": "Burger Palace"
+        },
+        {
+          "op": "add",
+          "item": "Classic Beef Burger",
+          "qty": 1,
+          "category": "Burgers"
+        },
+        {
+          "op": "openCart"
+        },
+        {
+          "op": "removeItem",
+          "item": "Classic Beef Burger"
+        },
+        {
+          "op": "expectButton",
+          "name": "Proceed to Checkout",
+          "present": false,
+          "fact": "F08"
+        }
+      ]
+    },
+    {
+      "id": "PS-04",
+      "title": "Cart: add food → reload the page",
+      "techniques": [
+        "state transitions"
+      ],
+      "facts": [
+        "F08"
+      ],
+      "stories": [
+        "FD-05",
+        "FD-06",
+        "FD-07"
+      ],
+      "builds": [
+        "learn",
+        "battle",
+        "bug"
+      ],
+      "status": "ready",
+      "data": {
+        "restaurant": "Burger Palace",
+        "items": [
+          [
+            "Classic Beef Burger",
+            1
+          ]
+        ],
+        "code": null
+      },
+      "steps": [
+        "Open the restaurant Burger Palace.",
+        "Add 1× Classic Beef Burger (Burgers tab).",
+        "Reload the page.",
+        "Open the cart."
+      ],
+      "expected": "After a page reload, Classic Beef Burger is still in the cart.",
+      "plan": [
+        {
+          "op": "openRestaurant",
+          "restaurant": "Burger Palace"
+        },
+        {
+          "op": "add",
+          "item": "Classic Beef Burger",
+          "qty": 1,
+          "category": "Burgers"
+        },
+        {
+          "op": "reload"
+        },
+        {
+          "op": "openCart"
+        },
+        {
+          "op": "expectText",
+          "text": "Classic Beef Burger",
+          "scope": "cart",
+          "fact": "F08"
+        }
+      ]
+    },
+    {
+      "id": "PS-05",
+      "title": "Forbidden transition: Empty cart → open checkout",
+      "techniques": [
+        "state transitions"
+      ],
+      "facts": [
+        "F08"
+      ],
+      "stories": [
+        "FD-05",
+        "FD-06",
+        "FD-07"
+      ],
+      "builds": [
+        "learn",
+        "battle",
+        "bug"
+      ],
+      "status": "ready",
+      "data": {
+        "restaurant": null,
+        "items": null,
+        "code": null
+      },
+      "steps": [
+        "Open the URL /checkout."
+      ],
+      "expected": "Checkout with an empty cart shows an empty state, no form and no Place Order.",
+      "plan": [
+        {
+          "op": "goto",
+          "path": "/checkout"
+        },
+        {
+          "op": "expectButton",
+          "name": "Place Order",
+          "present": false,
+          "fact": "F08"
+        }
+      ]
+    },
+    {
+      "id": "PS-06",
+      "title": "Forbidden transition: Checkout → Place Order with empty required fields",
+      "techniques": [
+        "state transitions"
+      ],
+      "facts": [
+        "F08"
+      ],
+      "stories": [
+        "FD-05",
+        "FD-06",
+        "FD-07"
+      ],
+      "builds": [
+        "learn",
+        "battle",
+        "bug"
+      ],
+      "status": "ready",
+      "data": {
+        "restaurant": "Burger Palace",
+        "items": [
+          [
+            "Classic Beef Burger",
+            1
+          ]
+        ],
+        "code": null
+      },
+      "steps": [
+        "Open the restaurant Burger Palace.",
+        "Add 1× Classic Beef Burger (Burgers tab).",
+        "Open the cart.",
+        "Proceed to Checkout.",
+        "Place Order."
+      ],
+      "expected": "No order is placed: no Order Confirmed!, the customer stays on the form (required: Full Name, Street Address, City, Phone Number).",
+      "plan": [
+        {
+          "op": "openRestaurant",
+          "restaurant": "Burger Palace"
+        },
+        {
+          "op": "add",
+          "item": "Classic Beef Burger",
+          "qty": 1,
+          "category": "Burgers"
+        },
+        {
+          "op": "openCart"
+        },
+        {
+          "op": "proceedToCheckout"
+        },
+        {
+          "op": "placeOrder"
+        },
+        {
+          "op": "expectNoText",
+          "text": "Order Confirmed!",
+          "fact": "F08"
+        },
+        {
+          "op": "expectButton",
+          "name": "Place Order",
+          "present": true,
+          "fact": "F08"
+        }
+      ]
+    },
+    {
+      "id": "PS-07",
+      "title": "Forbidden transition: Empty cart → track an order that was never placed",
+      "techniques": [
+        "state transitions"
+      ],
+      "facts": [
+        "F08"
+      ],
+      "stories": [
+        "FD-05",
+        "FD-06",
+        "FD-07"
+      ],
+      "builds": [
+        "learn",
+        "battle",
+        "bug"
+      ],
+      "status": "ready",
+      "data": {
+        "restaurant": null,
+        "items": null,
+        "code": null
+      },
+      "steps": [
+        "Open the URL /order/FDR-ZZZZZZ."
+      ],
+      "expected": "No tracking page is shown for FDR-ZZZZZZ.",
+      "plan": [
+        {
+          "op": "goto",
+          "path": "/order/FDR-ZZZZZZ"
+        },
+        {
+          "op": "expectNoText",
+          "text": "Total Paid",
+          "fact": "F08"
+        }
+      ]
+    },
+    {
+      "id": "PS-08",
+      "title": "Favourites: Burger Palace add → reload the page → remove",
+      "techniques": [
+        "state transitions"
+      ],
+      "facts": [
+        "F10"
+      ],
+      "stories": [
+        "FD-11"
+      ],
+      "builds": [
+        "battle"
+      ],
+      "status": "ready",
+      "data": {
+        "restaurant": "Burger Palace",
+        "items": null,
+        "code": null
+      },
+      "steps": [
+        "Open the URL /.",
+        "Click the heart on Burger Palace.",
+        "Reload the page.",
+        "Click the heart on Burger Palace."
+      ],
+      "expected": "The heart switches to \"Remove Burger Palace from favourites\", the card does not open, it stays a favourite after a page reload, and a second click removes it.",
+      "plan": [
+        {
+          "op": "goto",
+          "path": "/"
+        },
+        {
+          "op": "toggleFavourite",
+          "restaurant": "Burger Palace"
+        },
+        {
+          "op": "expectButton",
+          "name": "Remove Burger Palace from favourites",
+          "present": true,
+          "fact": "F10"
+        },
+        {
+          "op": "expectPath",
+          "path": "/",
+          "fact": "F10"
+        },
+        {
+          "op": "reload"
+        },
+        {
+          "op": "expectButton",
+          "name": "Remove Burger Palace from favourites",
+          "present": true,
+          "fact": "F10"
+        },
+        {
+          "op": "toggleFavourite",
+          "restaurant": "Burger Palace"
+        },
+        {
+          "op": "expectButton",
+          "name": "Add Burger Palace to favourites",
+          "present": true,
+          "fact": "F10"
+        }
+      ]
+    },
+    {
+      "id": "PS-09",
+      "title": "Favourites: Pizza Corner add → reload the page → remove",
+      "techniques": [
+        "state transitions"
+      ],
+      "facts": [
+        "F10"
+      ],
+      "stories": [
+        "FD-11"
+      ],
+      "builds": [
+        "battle"
+      ],
+      "status": "ready",
+      "data": {
+        "restaurant": "Pizza Corner",
+        "items": null,
+        "code": null
+      },
+      "steps": [
+        "Open the URL /.",
+        "Click the heart on Pizza Corner.",
+        "Reload the page.",
+        "Click the heart on Pizza Corner."
+      ],
+      "expected": "The heart switches to \"Remove Pizza Corner from favourites\", the card does not open, it stays a favourite after a page reload, and a second click removes it.",
+      "plan": [
+        {
+          "op": "goto",
+          "path": "/"
+        },
+        {
+          "op": "toggleFavourite",
+          "restaurant": "Pizza Corner"
+        },
+        {
+          "op": "expectButton",
+          "name": "Remove Pizza Corner from favourites",
+          "present": true,
+          "fact": "F10"
+        },
+        {
+          "op": "expectPath",
+          "path": "/",
+          "fact": "F10"
+        },
+        {
+          "op": "reload"
+        },
+        {
+          "op": "expectButton",
+          "name": "Remove Pizza Corner from favourites",
+          "present": true,
+          "fact": "F10"
+        },
+        {
+          "op": "toggleFavourite",
+          "restaurant": "Pizza Corner"
+        },
+        {
+          "op": "expectButton",
+          "name": "Add Pizza Corner to favourites",
+          "present": true,
+          "fact": "F10"
+        }
+      ]
+    },
+    {
+      "id": "PS-10",
+      "title": "Favourites: Sushi Masters add → reload the page → remove",
+      "techniques": [
+        "state transitions"
+      ],
+      "facts": [
+        "F10"
+      ],
+      "stories": [
+        "FD-11"
+      ],
+      "builds": [
+        "battle"
+      ],
+      "status": "ready",
+      "data": {
+        "restaurant": "Sushi Masters",
+        "items": null,
+        "code": null
+      },
+      "steps": [
+        "Open the URL /.",
+        "Click the heart on Sushi Masters.",
+        "Reload the page.",
+        "Click the heart on Sushi Masters."
+      ],
+      "expected": "The heart switches to \"Remove Sushi Masters from favourites\", the card does not open, it stays a favourite after a page reload, and a second click removes it.",
+      "plan": [
+        {
+          "op": "goto",
+          "path": "/"
+        },
+        {
+          "op": "toggleFavourite",
+          "restaurant": "Sushi Masters"
+        },
+        {
+          "op": "expectButton",
+          "name": "Remove Sushi Masters from favourites",
+          "present": true,
+          "fact": "F10"
+        },
+        {
+          "op": "expectPath",
+          "path": "/",
+          "fact": "F10"
+        },
+        {
+          "op": "reload"
+        },
+        {
+          "op": "expectButton",
+          "name": "Remove Sushi Masters from favourites",
+          "present": true,
+          "fact": "F10"
+        },
+        {
+          "op": "toggleFavourite",
+          "restaurant": "Sushi Masters"
+        },
+        {
+          "op": "expectButton",
+          "name": "Add Sushi Masters to favourites",
+          "present": true,
+          "fact": "F10"
+        }
+      ]
+    },
+    {
+      "id": "PS-11",
+      "title": "Favourites: Mediterranean Delight add → reload the page → remove",
+      "techniques": [
+        "state transitions"
+      ],
+      "facts": [
+        "F10"
+      ],
+      "stories": [
+        "FD-11"
+      ],
+      "builds": [
+        "battle"
+      ],
+      "status": "ready",
+      "data": {
+        "restaurant": "Mediterranean Delight",
+        "items": null,
+        "code": null
+      },
+      "steps": [
+        "Open the URL /.",
+        "Click the heart on Mediterranean Delight.",
+        "Reload the page.",
+        "Click the heart on Mediterranean Delight."
+      ],
+      "expected": "The heart switches to \"Remove Mediterranean Delight from favourites\", the card does not open, it stays a favourite after a page reload, and a second click removes it.",
+      "plan": [
+        {
+          "op": "goto",
+          "path": "/"
+        },
+        {
+          "op": "toggleFavourite",
+          "restaurant": "Mediterranean Delight"
+        },
+        {
+          "op": "expectButton",
+          "name": "Remove Mediterranean Delight from favourites",
+          "present": true,
+          "fact": "F10"
+        },
+        {
+          "op": "expectPath",
+          "path": "/",
+          "fact": "F10"
+        },
+        {
+          "op": "reload"
+        },
+        {
+          "op": "expectButton",
+          "name": "Remove Mediterranean Delight from favourites",
+          "present": true,
+          "fact": "F10"
+        },
+        {
+          "op": "toggleFavourite",
+          "restaurant": "Mediterranean Delight"
+        },
+        {
+          "op": "expectButton",
+          "name": "Add Mediterranean Delight to favourites",
+          "present": true,
+          "fact": "F10"
+        }
+      ]
+    },
+    {
+      "id": "PS-12",
+      "title": "Favourites: Koliba u Jána add → reload the page → remove",
+      "techniques": [
+        "state transitions"
+      ],
+      "facts": [
+        "F10"
+      ],
+      "stories": [
+        "FD-11"
+      ],
+      "builds": [
+        "battle"
+      ],
+      "status": "ready",
+      "data": {
+        "restaurant": "Koliba u Jána",
+        "items": null,
+        "code": null
+      },
+      "steps": [
+        "Open the URL /.",
+        "Click the heart on Koliba u Jána.",
+        "Reload the page.",
+        "Click the heart on Koliba u Jána."
+      ],
+      "expected": "The heart switches to \"Remove Koliba u Jána from favourites\", the card does not open, it stays a favourite after a page reload, and a second click removes it.",
+      "plan": [
+        {
+          "op": "goto",
+          "path": "/"
+        },
+        {
+          "op": "toggleFavourite",
+          "restaurant": "Koliba u Jána"
+        },
+        {
+          "op": "expectButton",
+          "name": "Remove Koliba u Jána from favourites",
+          "present": true,
+          "fact": "F10"
+        },
+        {
+          "op": "expectPath",
+          "path": "/",
+          "fact": "F10"
+        },
+        {
+          "op": "reload"
+        },
+        {
+          "op": "expectButton",
+          "name": "Remove Koliba u Jána from favourites",
+          "present": true,
+          "fact": "F10"
+        },
+        {
+          "op": "toggleFavourite",
+          "restaurant": "Koliba u Jána"
+        },
+        {
+          "op": "expectButton",
+          "name": "Add Koliba u Jána to favourites",
+          "present": true,
+          "fact": "F10"
+        }
+      ]
+    }
+  ]
+}

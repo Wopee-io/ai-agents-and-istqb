@@ -1,0 +1,13 @@
+{
+  "note": "Scoring key, not generator input. The defects planted in the builds (apps/README.md, table Defects per build). The generator never reads this file; run.mjs only uses it to sort the failed checks into planted and not planted.",
+  "defects": [
+    { "id": "FD-05 20% discount", "builds": ["learn", "battle", "bug"], "text": "The 20% restaurant discount over $25 never applies", "match": { "fact": "F04", "what": "restaurant discount" } },
+    { "id": "FD-06 empty form", "builds": ["learn", "battle", "bug"], "text": "Place Order with empty fields still places the order", "match": { "fact": "F08", "what": ["no Order Confirmed!", "button Place Order present"] } },
+    { "id": "FD-09 LEARN10", "builds": ["battle"], "text": "10% is taken from food and delivery ($1.59 / $15.85 instead of $1.30 / $16.14)", "match": { "fact": ["F05", "F06"], "what": "Promo LEARN10" } },
+    { "id": "FD-10 minimum", "builds": ["battle"], "text": "The minimum counts fees too, so $15.51 of food already passes", "match": { "fact": "F09" } },
+    { "id": "FD-11 favourites", "builds": ["battle"], "text": "Koliba u Jána loses its heart after a page reload", "match": { "fact": "F10" } },
+    { "id": "M1 order number", "builds": ["bug"], "text": "FDR- + 5 lower-case characters", "match": { "fact": "F08", "what": "order number" } },
+    { "id": "M2 checkout with empty cart", "builds": ["bug"], "text": "Checkout with an empty cart shows the form", "match": { "fact": "F08", "what": "button Place Order missing" } },
+    { "id": "M3 service fee", "builds": ["bug"], "text": "Service Fee $2.00 instead of $1.50", "match": { "fact": "F02" } }
+  ]
+}

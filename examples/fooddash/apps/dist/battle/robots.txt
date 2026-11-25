@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /operator
+Disallow: /checkout
+Disallow: /profile
+Disallow: /reset-password
+Disallow: /order/
+
+Sitemap: /sitemap.xml

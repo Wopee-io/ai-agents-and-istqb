@@ -1,0 +1,205 @@
+{
+  "product": "FoodDash (sample food delivery app)",
+  "sources": [
+    { "path": "spec/fooddash-spec.md", "stories": "FD-01 to FD-08" },
+    { "path": "spec/battle/fooddash-battle-spec.md", "stories": "FD-09 to FD-11, newer build only" }
+  ],
+  "approval": {
+    "status": "approved",
+    "by": "demo analyst",
+    "date": "2026-11-05",
+    "note": "An agent pulled the facts from the spec. The analyst approved them with four questions left open (at the bottom). The generator never turns a question into a test. It only lists it."
+  },
+  "builds": {
+    "learn": { "url": "http://localhost:4173", "dist": "apps/dist/learn", "stories": ["FD-01", "FD-02", "FD-03", "FD-04", "FD-05", "FD-06", "FD-07", "FD-08"] },
+    "battle": { "url": "http://localhost:4174", "dist": "apps/dist/battle", "stories": ["FD-01", "FD-02", "FD-03", "FD-04", "FD-05", "FD-06", "FD-07", "FD-08", "FD-09", "FD-10", "FD-11"] },
+    "bug": { "url": "http://localhost:4175", "dist": "apps/dist/bug", "stories": ["FD-01", "FD-02", "FD-03", "FD-04", "FD-05", "FD-06", "FD-07", "FD-08"] }
+  },
+  "facts": [
+    {
+      "id": "F01",
+      "type": "parameter",
+      "name": "Delivery fee",
+      "source": { "story": "FD-05", "quote": "The Delivery Fee is the fee the restaurant advertises — Free means $0.00." },
+      "values": { "from": "data.restaurants[].deliveryFee", "freeMeans": 0 }
+    },
+    {
+      "id": "F02",
+      "type": "parameter",
+      "name": "Service fee",
+      "source": { "story": "FD-05", "quote": "The Service Fee is a flat $1.50 per order." },
+      "values": { "amount": 150 }
+    },
+    {
+      "id": "F03",
+      "type": "rule",
+      "name": "Total price",
+      "source": { "story": "FD-05", "quote": "Total = Subtotal − discount + Delivery Fee + Service Fee" },
+      "values": { "formula": "subtotal - discount + delivery + service" }
+    },
+    {
+      "id": "F04",
+      "type": "limit",
+      "name": "Restaurant discount 20% over $25",
+      "source": { "story": "FD-05", "quote": "20% OFF orders over $25 takes 20 % off the subtotal once it passes $25, and the discount shows as its own line." },
+      "values": { "promotionText": "20% OFF orders over $25", "boundary": 2500, "appliesWhen": ">", "rate": 20, "base": "subtotal" }
+    },
+    {
+      "id": "F05",
+      "type": "rule",
+      "name": "Promo code LEARN10",
+      "source": { "story": "FD-09", "quote": "LEARN10 takes 10 % off the food subtotal. Delivery and service fees are never discounted." },
+      "values": { "code": "LEARN10", "rate": 10, "base": "subtotal", "line": "Promo LEARN10", "example": { "restaurant": "Burger Palace", "items": [["Classic Beef Burger", 1]], "discount": 130, "total": 1614 } }
+    },
+    {
+      "id": "F06",
+      "type": "limit",
+      "name": "LEARN10 discount rounding",
+      "source": { "story": "FD-09", "quote": "The discount is rounded to the nearest cent, halves up: 10 % of $12.95 is $1.30." },
+      "values": { "boundary": "half a cent", "rounding": "half-up", "rate": 10 }
+    },
+    {
+      "id": "F07",
+      "type": "lifecycle",
+      "name": "Promo code at checkout",
+      "source": { "story": "FD-09", "quote": "Codes are not case-sensitive: learn10 works too. An unknown code says This code is not valid and gives no discount. One code per order. Applying it again does not add a second discount. Remove takes it off." },
+      "values": {
+        "states": ["No code", "LEARN10 applied"],
+        "initial": "No code",
+        "transitions": [
+          { "id": "p1", "from": "No code", "event": "Apply with an unknown code", "input": "LEARN11", "to": "No code", "shows": "This code is not valid" },
+          { "id": "p2", "from": "No code", "event": "Apply with the code in lower case", "input": "learn10", "to": "LEARN10 applied" },
+          { "id": "p3", "from": "LEARN10 applied", "event": "Apply again", "input": "LEARN10", "to": "LEARN10 applied", "note": "still only one discount" },
+          { "id": "p4", "from": "LEARN10 applied", "event": "Remove", "to": "No code" }
+        ],
+        "forbidden": []
+      }
+    },
+    {
+      "id": "F08",
+      "type": "lifecycle",
+      "name": "Order lifecycle",
+      "source": { "story": "FD-05, FD-06, FD-07", "quote": "five stages in order: Order Confirmed → Preparing → Ready for Pickup → On the Way → Delivered" },
+      "values": {
+        "states": ["Empty cart", "Cart with food", "Checkout", "Order Confirmed", "Preparing", "Ready for Pickup", "On the Way", "Delivered"],
+        "initial": "Empty cart",
+        "final": "Delivered",
+        "transitions": [
+          { "id": "o1", "from": "Empty cart", "event": "add food", "to": "Cart with food", "source": "FD-03" },
+          { "id": "o2", "from": "Cart with food", "event": "Proceed to Checkout", "to": "Checkout", "source": "FD-05" },
+          { "id": "o3", "from": "Checkout", "event": "Place Order with all required fields", "to": "Order Confirmed", "source": "FD-06, FD-07" },
+          { "id": "o4", "from": "Order Confirmed", "event": "time passes", "to": "Preparing", "source": "FD-07" },
+          { "id": "o5", "from": "Preparing", "event": "time passes", "to": "Ready for Pickup", "source": "FD-07" },
+          { "id": "o6", "from": "Ready for Pickup", "event": "time passes", "to": "On the Way", "source": "FD-07" },
+          { "id": "o7", "from": "On the Way", "event": "time passes", "to": "Delivered", "source": "FD-07" },
+          { "id": "o8", "from": "Cart with food", "event": "remove the last item", "to": "Empty cart", "source": "FD-05" },
+          { "id": "o9", "from": "Cart with food", "event": "reload the page", "to": "Cart with food", "source": "FD-05: The cart survives a page reload" }
+        ],
+        "forbidden": [
+          { "id": "x1", "from": "Empty cart", "event": "open checkout", "source": "FD-06: Opening checkout with an empty cart shows an empty state ... never a form that could place an empty order." },
+          { "id": "x2", "from": "Checkout", "event": "Place Order with empty required fields", "source": "FD-06: Place Order only places the order when every required field is filled in." },
+          { "id": "x3", "from": "Empty cart", "event": "track an order that was never placed", "input": "FDR-ZZZZZZ", "source": "FD-07: An order number that was never placed does not show a tracking page." },
+          { "id": "x4", "from": "Delivered", "event": "go back to an earlier stage", "source": "FD-07: five stages in order" }
+        ],
+        "orderNumber": { "pattern": "^FDR-[A-Z0-9]{6}$", "source": "FD-07: FDR- followed by six upper-case letters or digits" },
+        "requiredFields": ["Full Name", "Street Address", "City", "Phone Number"],
+        "testCustomer": { "Full Name": "Jane Tester", "Street Address": "1 Test Street", "City": "Prague", "Phone Number": "+420 600 000 000" }
+      }
+    },
+    {
+      "id": "F09",
+      "type": "limit",
+      "name": "Minimum order",
+      "source": { "story": "FD-10", "quote": "Sushi Masters: $20.00. ... The minimum applies to the food subtotal only — fees do not count towards it. Below the minimum, the cart says Add $X.XX more to order from Sushi Masters ... and offers no way to check out. Checkout itself shows the same message instead of the form. At or above the minimum, checkout works as usual." },
+      "values": { "restaurant": "Sushi Masters", "boundary": 2000, "allowedWhen": ">=", "base": "subtotal", "message": "Add ${missing} more to order from Sushi Masters" }
+    },
+    {
+      "id": "F10",
+      "type": "lifecycle",
+      "name": "Favourite restaurants",
+      "source": { "story": "FD-11", "quote": "Every restaurant card ... has a heart button ... Add Sushi Masters to favourites / Remove Sushi Masters from favourites. Clicking the heart on a card does not open the restaurant. ... Favourites survive a page reload ... This works for every restaurant." },
+      "values": {
+        "forEach": "data.restaurants",
+        "states": ["Not a favourite", "Favourite"],
+        "initial": "Not a favourite",
+        "transitions": [
+          { "id": "f1", "from": "Not a favourite", "event": "click the heart on the card", "to": "Favourite" },
+          { "id": "f2", "from": "Favourite", "event": "reload the page", "to": "Favourite" },
+          { "id": "f3", "from": "Favourite", "event": "click the heart on the card", "to": "Not a favourite" }
+        ],
+        "forbidden": []
+      }
+    }
+  ],
+  "decisionTables": [
+    { "id": "DT1", "name": "Discounts and minimum order", "conditions": ["F04", "F05", "F09"], "note": "Conditions: 20% discount applies (yes/no) × LEARN10 applied (yes/no) × minimum order (none/met/not met) = 12 combinations." }
+  ],
+  "data": {
+    "note": "Test data, not rules: prices and fees from the restaurant cards and menus in the app (FD-01 and FD-03 show them, the spec does not list them), read on 5 Nov 2026. Base prices only: the newer build has no size option.",
+    "restaurants": [
+      {
+        "name": "Burger Palace",
+        "deliveryFee": 299,
+        "promotion": "20% OFF orders over $25",
+        "minOrder": null,
+        "menu": [
+          ["Classic Beef Burger", 1295, "Burgers"], ["Chicken Deluxe", 1499, "Burgers"], ["Veggie Supreme", 1199, "Burgers"], ["Double Smash Burger", 1599, "Burgers"],
+          ["Truffle Fries", 899, "Sides"], ["Onion Rings", 699, "Sides"], ["Coleslaw", 499, "Sides"], ["Classic Lemonade", 399, "Drinks"], ["Milkshake", 649, "Drinks"]
+        ]
+      },
+      {
+        "name": "Pizza Corner",
+        "deliveryFee": "Free",
+        "promotion": null,
+        "minOrder": null,
+        "menu": [
+          ["Margherita", 1399, "Pizzas"], ["Pepperoni Feast", 1599, "Pizzas"], ["Quattro Formaggi", 1699, "Pizzas"], ["Prosciutto & Arugula", 1799, "Pizzas"],
+          ["Spaghetti Carbonara", 1499, "Pasta"], ["Penne Arrabbiata", 1299, "Pasta"], ["Tiramisu", 899, "Desserts"], ["Panna Cotta", 799, "Desserts"]
+        ]
+      },
+      {
+        "name": "Sushi Masters",
+        "deliveryFee": 199,
+        "promotion": null,
+        "minOrder": { "amount": 2000, "builds": ["battle"] },
+        "menu": [
+          ["California Roll", 1099, "Sushi Rolls"], ["Spicy Tuna Roll", 1299, "Sushi Rolls"], ["Dragon Roll", 1599, "Sushi Rolls"], ["Rainbow Roll", 1699, "Sushi Rolls"],
+          ["Salmon Nigiri (2pc)", 699, "Nigiri"], ["Tuna Nigiri (2pc)", 899, "Nigiri"], ["Ebi Nigiri (2pc)", 599, "Nigiri"],
+          ["Chicken Teriyaki", 1499, "Hot Dishes"], ["Miso Ramen", 1599, "Hot Dishes"], ["Tempura Udon", 1399, "Hot Dishes"]
+        ]
+      },
+      { "name": "Mediterranean Delight", "deliveryFee": 349, "promotion": "Free dessert with orders over $30", "minOrder": null, "menu": [], "excludedFromPrices": "Q3" },
+      { "name": "Koliba u Jána", "deliveryFee": 349, "promotion": "20% off your first order", "minOrder": null, "menu": [], "excludedFromPrices": "Q3" }
+    ]
+  },
+  "openQuestions": [
+    {
+      "id": "Q1",
+      "facts": ["F04", "F05"],
+      "question": "Does the 20% restaurant discount (over $25) stack with the code LEARN10? If so, in what order, and is the $25 boundary checked before or after the code discount?",
+      "why": "Decision table: the spec gives no result for the combination \"restaurant discount applies × LEARN10 applied\".",
+      "status": "open: the spec is silent, question for the analyst"
+    },
+    {
+      "id": "Q2",
+      "facts": ["F04"],
+      "question": "Does the 20% discount also apply to an order of exactly $25.00? The text says \"over $25\" and \"once it passes $25\", so the card uses \"more than $25\".",
+      "why": "This is the value exactly on the boundary. Also, $25.00 cannot be built from the Burger Palace menu, so there is no test on the boundary yet.",
+      "status": "reading to confirm"
+    },
+    {
+      "id": "Q3",
+      "facts": ["F04"],
+      "question": "What do the offers \"20% off your first order\" (Koliba u Jána) and \"Free dessert with orders over $30\" (Mediterranean Delight) mean? The spec only defines \"20% OFF orders over $25\". A \"first order\" makes no sense without an account.",
+      "why": "The app shows them on the cards, but there is no rule for them. The generator leaves these restaurants out of the price tests.",
+      "status": "open"
+    },
+    {
+      "id": "Q4",
+      "facts": ["F04"],
+      "question": "How is the 20% restaurant discount rounded? The spec gives the \"halves up\" rule only for LEARN10.",
+      "why": "So for the 20% discount the generator only picks carts where the discount comes out in whole cents.",
+      "status": "open"
+    }
+  ]
+}

@@ -1,0 +1,293 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "FoodDash Public Catalogue API",
+    "description": "Read-only access to the restaurant catalogue and menu items used by the FoodDash app, served by PostgREST. Only the `restaurants` and `menu_items` tables are documented here.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "/rest/v1",
+      "description": "Documentation only: the frozen FoodDash build has no live API"
+    }
+  ],
+  "security": [
+    {
+      "apiKeyHeader": [],
+      "bearerAuth": []
+    }
+  ],
+  "tags": [
+    { "name": "restaurants", "description": "Restaurant catalogue" },
+    { "name": "menu_items", "description": "Menu items belonging to a restaurant" }
+  ],
+  "paths": {
+    "/restaurants": {
+      "get": {
+        "tags": ["restaurants"],
+        "summary": "List restaurants",
+        "description": "Returns rows from the public `restaurants` table. Publicly readable.",
+        "parameters": [
+          { "$ref": "#/components/parameters/select" },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "description": "Ordering expression, e.g. `name` or `name.desc`.",
+            "schema": { "type": "string" },
+            "example": "name"
+          },
+          { "$ref": "#/components/parameters/limit" },
+          {
+            "name": "slug",
+            "in": "query",
+            "required": false,
+            "description": "Filter on the `slug` column using a PostgREST operator, e.g. `eq.koliba-u-jana`.",
+            "schema": { "type": "string" },
+            "example": "eq.koliba-u-jana"
+          },
+          { "$ref": "#/components/parameters/acceptProfile" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Matching restaurants.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Restaurant" }
+                },
+                "example": [
+                  {
+                    "id": "3f1c9f2a-9b0e-4c1d-8a77-5f2e7c4d1a01",
+                    "slug": "koliba-u-jana",
+                    "name": "Koliba u Jána",
+                    "image_url": "/images/koliba.jpg",
+                    "cuisine": "Slovak",
+                    "rating": 4.8,
+                    "reviews": 312,
+                    "delivery_time": "30-40 min",
+                    "delivery_fee": "$2.99",
+                    "description": "Traditional Slovak dishes cooked the way grandma did.",
+                    "address": "Hlavná 12, Bratislava",
+                    "promo": "Free delivery over $30",
+                    "categories": ["Slovak", "Comfort food"],
+                    "owner_id": "8c2d5b41-27ac-4f1e-9d3b-64ab90f1c7de",
+                    "created_at": "2026-02-11T09:14:22.512Z",
+                    "updated_at": "2026-02-18T17:02:41.183Z"
+                  }
+                ]
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "400": { "$ref": "#/components/responses/BadRequest" }
+        }
+      }
+    },
+    "/menu_items": {
+      "get": {
+        "tags": ["menu_items"],
+        "summary": "List menu items",
+        "description": "Returns rows from the public `menu_items` table. Publicly readable.",
+        "parameters": [
+          { "$ref": "#/components/parameters/select" },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "description": "Ordering expression, e.g. `sort_order` or `price.desc`.",
+            "schema": { "type": "string" },
+            "example": "sort_order"
+          },
+          { "$ref": "#/components/parameters/limit" },
+          {
+            "name": "restaurant_id",
+            "in": "query",
+            "required": false,
+            "description": "Filter on the `restaurant_id` column using a PostgREST operator, e.g. `eq.3f1c9f2a-9b0e-4c1d-8a77-5f2e7c4d1a01`.",
+            "schema": { "type": "string" },
+            "example": "eq.3f1c9f2a-9b0e-4c1d-8a77-5f2e7c4d1a01"
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "description": "Filter on the `id` column (text primary key), e.g. `eq.koliba-halusky`.",
+            "schema": { "type": "string" },
+            "example": "eq.koliba-halusky"
+          },
+          { "$ref": "#/components/parameters/acceptProfile" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Matching menu items.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/MenuItem" }
+                },
+                "example": [
+                  {
+                    "id": "koliba-halusky",
+                    "restaurant_id": "3f1c9f2a-9b0e-4c1d-8a77-5f2e7c4d1a01",
+                    "name": "Bryndzové halušky",
+                    "description": "Potato dumplings with sheep cheese and bacon.",
+                    "price": 12.5,
+                    "image_url": "/images/halusky.jpg",
+                    "popular": true,
+                    "category": "Main dishes",
+                    "sort_order": 1,
+                    "created_at": "2026-02-11T09:16:03.227Z",
+                    "updated_at": "2026-02-11T09:16:03.227Z"
+                  }
+                ]
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "400": { "$ref": "#/components/responses/BadRequest" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "apiKeyHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "apikey",
+        "description": "Public anon key of the Supabase project."
+      },
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "`Authorization: Bearer <public anon key>` — the same key as the `apikey` header when no user session is used."
+      }
+    },
+    "parameters": {
+      "select": {
+        "name": "select",
+        "in": "query",
+        "required": false,
+        "description": "Columns to return. `*` returns all columns; a comma-separated list returns a subset.",
+        "schema": { "type": "string" },
+        "example": "*"
+      },
+      "limit": {
+        "name": "limit",
+        "in": "query",
+        "required": false,
+        "description": "Maximum number of rows to return.",
+        "schema": { "type": "integer", "minimum": 1 },
+        "example": 20
+      },
+      "acceptProfile": {
+        "name": "Accept-Profile",
+        "in": "header",
+        "required": false,
+        "description": "Database schema to read from. Defaults to `public`.",
+        "schema": { "type": "string", "default": "public" }
+      }
+    },
+    "responses": {
+      "Unauthorized": {
+        "description": "Missing or invalid API key.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "Invalid query parameter or filter expression.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "Restaurant": {
+        "type": "object",
+        "description": "Row of the public `restaurants` table.",
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "cuisine",
+          "rating",
+          "reviews",
+          "delivery_time",
+          "delivery_fee",
+          "categories",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "description": "Primary key (uuid), defaults to gen_random_uuid()." },
+          "slug": { "type": "string", "description": "URL slug (text, not null)." },
+          "name": { "type": "string", "description": "Restaurant name (text, not null)." },
+          "image_url": { "type": "string", "nullable": true, "description": "Cover image URL (text, nullable)." },
+          "cuisine": { "type": "string", "description": "Cuisine label (text, not null)." },
+          "rating": { "type": "number", "description": "Average rating (numeric, not null, default 0)." },
+          "reviews": { "type": "integer", "description": "Review count (integer, not null, default 0)." },
+          "delivery_time": { "type": "string", "description": "Delivery time range (text, not null, default '30-40 min')." },
+          "delivery_fee": { "type": "string", "description": "Delivery fee as displayed text (text, not null, default '$2.99')." },
+          "description": { "type": "string", "nullable": true, "description": "Long description (text, nullable)." },
+          "address": { "type": "string", "nullable": true, "description": "Street address (text, nullable)." },
+          "promo": { "type": "string", "nullable": true, "description": "Promotion label (text, nullable)." },
+          "categories": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Category labels (text[], not null, default '{}')."
+          },
+          "owner_id": { "type": "string", "format": "uuid", "nullable": true, "description": "Owning operator's user id (uuid, nullable)." },
+          "min_order": { "type": "number", "nullable": true, "description": "Minimum order value (numeric, nullable; null means no minimum)." },
+          "created_at": { "type": "string", "format": "date-time", "description": "timestamptz, not null, default now()." },
+          "updated_at": { "type": "string", "format": "date-time", "description": "timestamptz, not null, default now()." }
+        }
+      },
+      "MenuItem": {
+        "type": "object",
+        "description": "Row of the public `menu_items` table.",
+        "required": [
+          "id",
+          "restaurant_id",
+          "name",
+          "price",
+          "popular",
+          "category",
+          "sort_order",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "id": { "type": "string", "description": "Primary key (text, not null)." },
+          "restaurant_id": { "type": "string", "format": "uuid", "description": "References restaurants.id (uuid, not null)." },
+          "name": { "type": "string", "description": "Item name (text, not null)." },
+          "description": { "type": "string", "nullable": true, "description": "Item description (text, nullable)." },
+          "price": { "type": "number", "description": "Price (numeric, not null)." },
+          "image_url": { "type": "string", "nullable": true, "description": "Item image URL (text, nullable)." },
+          "popular": { "type": "boolean", "description": "Popular flag (boolean, not null, default false)." },
+          "category": { "type": "string", "description": "Menu section (text, not null)." },
+          "sort_order": { "type": "integer", "description": "Display order (integer, not null, default 0)." },
+          "created_at": { "type": "string", "format": "date-time", "description": "timestamptz, not null, default now()." },
+          "updated_at": { "type": "string", "format": "date-time", "description": "timestamptz, not null, default now()." }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "description": "PostgREST error payload.",
+        "properties": {
+          "code": { "type": "string", "nullable": true },
+          "message": { "type": "string" },
+          "details": { "type": "string", "nullable": true },
+          "hint": { "type": "string", "nullable": true }
+        }
+      }
+    }
+  }
+}

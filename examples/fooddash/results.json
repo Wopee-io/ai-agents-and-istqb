@@ -1,0 +1,210 @@
+{
+  "battle": {
+    "url": "http://localhost:4174",
+    "executed": 22,
+    "passed": 9,
+    "failed": 13,
+    "failedTests": [
+      "HH-02",
+      "HH-03",
+      "HH-05",
+      "HH-06",
+      "HH-07",
+      "PK-01",
+      "PS-01",
+      "PS-04",
+      "PS-06",
+      "PS-07",
+      "PS-12",
+      "RT-02",
+      "RT-03"
+    ],
+    "planted": [
+      {
+        "id": "FD-05 20% discount",
+        "text": "The 20% restaurant discount over $25 never applies",
+        "by": [
+          "HH-02"
+        ]
+      },
+      {
+        "id": "FD-06 empty form",
+        "text": "Place Order with empty fields still places the order",
+        "by": [
+          "PS-06"
+        ]
+      },
+      {
+        "id": "FD-09 LEARN10",
+        "text": "10% is taken from food and delivery ($1.59 / $15.85 instead of $1.30 / $16.14)",
+        "by": [
+          "HH-05",
+          "HH-06",
+          "HH-07",
+          "PS-01",
+          "RT-02"
+        ]
+      },
+      {
+        "id": "FD-10 minimum",
+        "text": "The minimum counts fees too, so $15.51 of food already passes",
+        "by": [
+          "HH-03",
+          "RT-03"
+        ]
+      },
+      {
+        "id": "FD-11 favourites",
+        "text": "Koliba u Jána loses its heart after a page reload",
+        "by": [
+          "PS-12"
+        ]
+      }
+    ],
+    "notOnPlantedList": [
+      {
+        "what": "F01 · Delivery Fee",
+        "tests": [
+          "PK-01 (expected $0.00, got $2.99)",
+          "RT-02 (expected $1.99, got $2.99)"
+        ]
+      },
+      {
+        "what": "F08 · text \"Classic Beef Burger\"",
+        "tests": [
+          "PS-04 (expected shown, got missing)"
+        ]
+      },
+      {
+        "what": "F08 · no Total Paid",
+        "tests": [
+          "PS-07 (expected not shown, got shown)"
+        ]
+      }
+    ]
+  },
+  "learn": {
+    "url": "http://localhost:4173",
+    "executed": 9,
+    "passed": 4,
+    "failed": 5,
+    "failedTests": [
+      "HH-02",
+      "PK-01",
+      "PS-04",
+      "PS-06",
+      "PS-07"
+    ],
+    "planted": [
+      {
+        "id": "FD-05 20% discount",
+        "text": "The 20% restaurant discount over $25 never applies",
+        "by": [
+          "HH-02"
+        ]
+      },
+      {
+        "id": "FD-06 empty form",
+        "text": "Place Order with empty fields still places the order",
+        "by": [
+          "PS-06"
+        ]
+      }
+    ],
+    "notOnPlantedList": [
+      {
+        "what": "F01 · Delivery Fee",
+        "tests": [
+          "PK-01 (expected $0.00, got $2.99)"
+        ]
+      },
+      {
+        "what": "F08 · text \"Classic Beef Burger\"",
+        "tests": [
+          "PS-04 (expected shown, got missing)"
+        ]
+      },
+      {
+        "what": "F08 · no Total Paid",
+        "tests": [
+          "PS-07 (expected not shown, got shown)"
+        ]
+      }
+    ]
+  },
+  "bug": {
+    "url": "http://localhost:4175",
+    "executed": 9,
+    "passed": 1,
+    "failed": 8,
+    "failedTests": [
+      "HH-01",
+      "HH-02",
+      "PK-01",
+      "PS-02",
+      "PS-04",
+      "PS-05",
+      "PS-06",
+      "PS-07"
+    ],
+    "planted": [
+      {
+        "id": "FD-05 20% discount",
+        "text": "The 20% restaurant discount over $25 never applies",
+        "by": [
+          "HH-02"
+        ]
+      },
+      {
+        "id": "FD-06 empty form",
+        "text": "Place Order with empty fields still places the order",
+        "by": [
+          "PS-06"
+        ]
+      },
+      {
+        "id": "M1 order number",
+        "text": "FDR- + 5 lower-case characters",
+        "by": [
+          "PS-02"
+        ]
+      },
+      {
+        "id": "M2 checkout with empty cart",
+        "text": "Checkout with an empty cart shows the form",
+        "by": [
+          "PS-05"
+        ]
+      },
+      {
+        "id": "M3 service fee",
+        "text": "Service Fee $2.00 instead of $1.50",
+        "by": [
+          "HH-01",
+          "HH-02",
+          "PK-01"
+        ]
+      }
+    ],
+    "notOnPlantedList": [
+      {
+        "what": "F01 · Delivery Fee",
+        "tests": [
+          "PK-01 (expected $0.00, got $2.99)"
+        ]
+      },
+      {
+        "what": "F08 · text \"Classic Beef Burger\"",
+        "tests": [
+          "PS-04 (expected shown, got missing)"
+        ]
+      },
+      {
+        "what": "F08 · no Total Paid",
+        "tests": [
+          "PS-07 (expected not shown, got shown)"
+        ]
+      }
+    ]
+  }
+}

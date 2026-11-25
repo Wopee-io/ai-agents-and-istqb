@@ -1,0 +1,28 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  example:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm run unit
+      - run: npm run check-card
+      - name: Generated tests are committed and reproducible
+        run: |
+          npm run generate
+          npm run generate
+          git diff --exit-code examples/fooddash/tests.json examples/fooddash/tests.md
+      - run: npx playwright install --with-deps chromium
+      - name: The tests find every planted defect
+        run: |
+          npm run tests | tee run.log
+          grep -q "battle  run 22, passed 9, failed 13 · planted defects found 5/5" run.log
+          grep -q "learn   run 9, passed 4, failed 5 · planted defects found 2/2" run.log
+          grep -q "bug     run 9, passed 1, failed 8 · planted defects found 5/5" run.log

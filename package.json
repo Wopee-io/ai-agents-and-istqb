@@ -1,0 +1,22 @@
+{
+  "name": "ai-agents-and-istqb",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "From a spec to tests you can trust: an AI agent fills a fact card, an analyst approves it, code applies ISTQB techniques, the browser runs the tests.",
+  "license": "CC-BY-NC-4.0",
+  "engines": {
+    "node": ">=20.12"
+  },
+  "scripts": {
+    "apps": "node examples/fooddash/serve-apps.mjs",
+    "check-card": "node lib/check-card.mjs examples/fooddash/fact-card.json",
+    "generate": "node examples/fooddash/generate.mjs",
+    "tests": "node examples/fooddash/run.mjs",
+    "demo": "npm run check-card && npm run generate && npm run generate && node examples/fooddash/run.mjs battle",
+    "unit": "node --test lib/*.test.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.0"
+  }
+}
