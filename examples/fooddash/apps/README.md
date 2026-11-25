@@ -3,6 +3,7 @@
 > **Spoilers.** This page lists the defects in the app. It is the answer key: read it after you have run the tests.
 
 Three frozen builds of one sample food-delivery app. They run offline: no backend, no account, no real orders.
+The data (restaurants, menus, prices) is a fixture bundled into each build.
 `npm run apps` serves them; `npm run tests` serves a build by itself when it is not up.
 
 | Build | Port | What it is |

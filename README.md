@@ -12,7 +12,8 @@ AI-generated tests_ (Winter Business Breakfast by Tesena).
 
 ## Run it
 
-Needs Node 20.12 or newer. No account, no API key.
+Needs Node 20.12 or newer. No account, no API key. Tested on macOS and Linux (CI); **not tested on Windows yet**.
+If something breaks there, please open an issue with the output.
 
 ```bash
 git clone https://github.com/Wopee-io/ai-agents-and-istqb
@@ -166,6 +167,8 @@ minute) or `npm run tests battle`, `npm run apps` (click through the app on port
   It cannot tell whether the fact built on the quote reads it correctly. That is what the analyst's review is for.
 - **The card is already filled and approved**, so the example runs without a model. To see the model's part, give
   an agent the spec and the skill `extract-facts`.
+- **Not tested on Windows.** Paths and line endings are handled with that in mind (`.gitattributes`, no shell
+  globbing in the npm scripts), but nobody has run it there yet.
 - The method fits rules that are limits, tables, lifecycles and parameters. A domain whose rules are not of that
   kind gives the card little to carry.
 
