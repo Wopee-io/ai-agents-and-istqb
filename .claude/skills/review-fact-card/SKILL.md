@@ -22,7 +22,7 @@ The analyst reviews a short list of facts with their sources instead of hundreds
    npm run approve -- "<analyst name>"     # FoodDash; any card: node lib/approve.mjs <card> "<name>"
    ```
 
-   The command stores who approved, when, and a hash of the facts, decision tables, test data and open questions.
+   The command stores who approved, when, and a hash of the sources list, builds, facts, decision tables, test data and open questions.
 6. Run `npm run check-card`: it must say `approved by …, unchanged since`. Then use `generate-tests`.
 
 ## Rules

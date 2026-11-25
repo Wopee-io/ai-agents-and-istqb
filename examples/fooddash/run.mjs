@@ -12,6 +12,7 @@ import { existsSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'no
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { serve, pageText } from '../../lib/serve.mjs'
+import { contentHash } from '../../lib/check-card.mjs'
 
 const dir = dirname(fileURLToPath(import.meta.url))
 const fail = (message) => {
@@ -39,7 +40,8 @@ const ALL = Object.keys(card.builds)
 const builds = args.filter((a) => !a.startsWith('--'))
 const unknownBuild = builds.find((b) => !card.builds[b])
 if (unknownBuild) fail(`No build "${unknownBuild}" in fact-card.json. Builds: ${ALL.join(', ')}`)
-const order = builds.length ? builds : ['battle', 'learn', 'bug'].filter((b) => card.builds[b])
+const order = builds.length ? builds : [...ALL].sort((a, b) => (a === 'battle' ? -1 : b === 'battle' ? 1 : 0)) // newest build first
+if (suite.cardSha256 !== contentHash(card)) fail('tests.json was generated from a different fact card than the one on disk. Run: npm run generate')
 const APP = card.product.split(' ')[0] // "FoodDash": the page on the port must be this app, not whatever else listens there
 
 const anyOf = (v, f) => (Array.isArray(v) ? v.some(f) : f(v))

@@ -261,6 +261,7 @@ for (const t of suite.tests.filter((t) => t.status === 'ready' && t.builds.inclu
       for (const o of t.plan) await run(ctx, o)
     } catch (e) {
       error = String(e.message).split('\n')[0]
+      await page.screenshot({ path: fileURLToPath(new URL(`${t.id}.png`, resultsDir)) }).catch(() => {})
       checks.push({ fact: null, what: 'test step failed', expected: '', actual: error, ok: false })
     }
     const failed = checks.filter((c) => !c.ok)

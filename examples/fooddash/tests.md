@@ -1,6 +1,6 @@
 # FoodDash: tests from the fact card
 
-Generated from `fact-card.json` (sha256 `d9a921fdae0a…`) by `generate.mjs`. No model, no randomness: same card = same tests.
+Generated from `fact-card.json` (sha256 `cd95e4749cf0…`) by `generate.mjs`. No model, no randomness: same card = same tests.
 
 **23 tests**: 22 ready, 1 blocked by a question. By technique: boundary values (3-value) 7, decision table 3, each parameter value 1, state transitions 12.
 
@@ -53,7 +53,7 @@ Per build: learn 9, battle 22, bug 9 (FD-09 to FD-11 exist only in the newer bat
 
 ## Open questions for the analyst
 
-- **Q1** (open: the spec is silent, question for the analyst): Does the 20% restaurant discount (over $25) stack with the code LEARN10? If so, in what order, and is the $25 boundary checked before or after the code discount? Decision table: the spec gives no result for the combination "restaurant discount applies × LEARN10 applied".
+- **Q1** (open): Does the 20% restaurant discount (over $25) stack with the code LEARN10? If so, in what order, and is the $25 boundary checked before or after the code discount? Decision table: the spec gives no result for the combination "restaurant discount applies × LEARN10 applied".
 - **Q2** (reading to confirm): Does the 20% discount also apply to an order of exactly $25.00? The text says "over $25" and "once it passes $25", so the card uses "more than $25". This is the value exactly on the boundary. Also, $25.00 cannot be built from the Burger Palace menu, so there is no test on the boundary yet.
 - **Q3** (open): What do the offers "20% off your first order" (Koliba u Jána) and "Free dessert with orders over $30" (Mediterranean Delight) mean? The spec only defines "20% OFF orders over $25". A "first order" makes no sense without an account. The app shows them on the cards, but there is no rule for them. The generator leaves these restaurants out of the price tests.
 - **Q4** (open): How is the 20% restaurant discount rounded? The spec gives the "halves up" rule only for LEARN10. So for the 20% discount the generator only picks carts where the discount comes out in whole cents.

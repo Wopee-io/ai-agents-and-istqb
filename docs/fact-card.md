@@ -9,7 +9,7 @@ can compute from. Everything after it is deterministic. A complete, approved car
 | --- | --- |
 | `product` | name of the product under test |
 | `sources` | `[{ "path", "stories" }]`: the documents the facts come from, paths relative to the card |
-| `approval` | `{ "status", "by", "date", "sha256", "note" }`, written by `node lib/approve.mjs <card> "<name>"`. The hash covers facts, decision tables, test data and open questions; the generator only runs while it matches |
+| `approval` | `{ "status", "by", "date", "sha256", "note" }`, written by `node lib/approve.mjs <card> "<name>"`. The hash covers sources, builds, facts, decision tables, test data and open questions; the generator only runs while it matches |
 | `builds` | `{ key: { "url", "dist", "stories" } }`: where each version of the app runs and which stories it has |
 | `facts` | the facts, see below |
 | `decisionTables` | `[{ "id", "name", "conditions": [fact ids] }]`: which facts interact |
@@ -67,7 +67,9 @@ The binding reads these keys, so use these names. Amounts are integers in the sm
 { "code": "LEARN10", "rate": 10, "base": "subtotal", "line": "Promo LEARN10", "example": { "restaurant": "Burger Palace", "items": [["Classic Beef Burger", 1]], "discount": 130, "total": 1614 } }
 ```
 
-`formula` for a computation, `rate` and `base` for a percentage, `example` when the document gives a worked example (the generator prefers the document's own example as test data).
+`formula` for a computation (free text, for the reader), `rate` and `base` for a percentage, `example` when the document gives a worked example (the generator prefers the document's own example as test data). Put into `example` only what the document states; here the spec says "10 % of $12.95 is $1.30", and the restaurant, dish and total were added by the analyst from the test data. A list the document gives (required fields, payment methods) goes in as an array under a name of your choice, such as `requiredFields`.
+
+Two things in `values` are not quotes and may be written by the author of the card: a placeholder in a message (`${missing}` for the document's `$X.XX`) and a test input the document leaves open (`"input": "LEARN11"` for "an unknown code").
 
 **lifecycle**
 
@@ -104,6 +106,7 @@ or `{ "from": "data.restaurants[].deliveryFee", "freeMeans": 0 }` when the value
 - Each part needs at least three words and must start and end on a word boundary: `$20` does not match `$20.00`.
 - Ignored in the document when comparing: line breaks, repeated spaces, list and quote markers, markdown emphasis, table bars and link targets. A table row is quoted as its cells: `Full Name yes`.
 - A quote must come from one document. It cannot be stitched from two.
+- A skip of whole sentences is always fine. A skip inside a sentence is refused when the skipped words include a negation (not, never, no, only, …), because that would turn the meaning around.
 
 ## Open questions
 
@@ -114,4 +117,4 @@ result, a boundary whose own value is unclear, a rounding rule that is missing.
 - When the analyst answers, the answer becomes a fact (with the analyst's answer as its source) and the question is removed.
 - A reading the card had to choose ("over $25" taken as "more than $25") is also a question, with status `reading to confirm`. Every other question has status `open`.
 - Missing test data (a price list the documents do not contain) is asked for in the hand-over message, not as an open question. Questions are for missing rules.
-- `data` entries may point at a question, for example `"excludedFromPrices": "Q3"`: the generator leaves that entry out until the question is answered.
+- `data` entries may point at a question, for example `"excludedFromPrices": "Q3"`: the generator leaves that entry out while the question is open. `check-card` reports a pointer to a question that is no longer on the card.

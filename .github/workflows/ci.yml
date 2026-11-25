@@ -22,7 +22,8 @@ jobs:
       - name: A changed card is not approved any more
         run: |
           sed -i 's/"boundary": 2000/"boundary": 1500/' examples/fooddash/fact-card.json
-          if npm run generate; then echo "the generator accepted a card that changed after approval"; exit 1; fi
+          if npm run generate 2> refused.log; then echo "the generator accepted a card that changed after approval"; exit 1; fi
+          grep -q "changed after it was approved" refused.log
           git checkout examples/fooddash/fact-card.json
       - run: npx playwright install --with-deps chromium
       - name: The tests find every planted defect

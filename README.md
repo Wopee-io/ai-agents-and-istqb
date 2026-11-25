@@ -31,7 +31,7 @@ approval: approved by demo analyst, 2026-11-25, unchanged since
 ✔ every quote is in the sources, every reference resolves
 
 23 tests (22 ready, 1 blocked by question Q1) · boundary values (3-value): 7 · decision table: 3 · each parameter value: 1 · state transitions: 12
-sha256 tests.json  f7613296f1…      ← printed twice, the same on both runs
+sha256 tests.json  203817b0a2…      ← printed twice, the same on both runs
 
   ✘ HH-03 Minimum order $20: cart just below the boundary ($19.98)
         F09 · text "Add $0.02 more to order from Sushi Masters": expected shown, got missing
@@ -91,7 +91,9 @@ The spec says, in story FD-10:
   `npm run check-card`. It fails and names the fact.
 - **Change a fact.** Change the `F09` boundary from `2000` to `1500` and run `npm run generate`. The generator
   refuses: the card changed after it was approved. Approve it as the analyst, `npm run approve -- "Your Name"`,
-  generate again, and `git diff examples/fooddash/tests.md` shows exactly which tests moved: a $14.99 and a $15.98 cart.
+  generate again, and `git diff examples/fooddash/tests.md` shows what moved: the tests around the minimum now use
+  carts of $14.98, $14.99 and $15.98, one more than before because the menu can build two of the boundary values.
+  Test ids are numbered in order, so the ids after HH-03 shift by one.
 - **Preview without approving.** `npm run generate -- --draft` writes `tests.draft.md` and leaves the real tests alone.
 - **Look at one failure.** `npm run apps`, open http://localhost:4174, put a California Roll and a Tuna Nigiri from
   Sushi Masters in the cart. The spec says you cannot check out. The app lets you.
@@ -163,8 +165,13 @@ minute) or `npm run tests battle`, `npm run apps` (click through the app on port
   test data and the expected result.
 - **Tours are stable, not minimal.** The state-transition walk covers every valid move with a greedy, repeatable
   algorithm. A hand-made set could be shorter.
-- **The quote check is strict but literal.** It proves a quote is in the document, in order and on word boundaries.
-  It cannot tell whether the fact built on the quote reads it correctly. That is what the analyst's review is for.
+- **The quote check is strict but literal.** It proves a quote is in the document, in order and on word boundaries,
+  and it refuses a skip inside a sentence that drops a negation. It cannot tell whether the fact built on the quote
+  reads it correctly. That is what the analyst's review is for. A sentence that itself contains `...` cannot be quoted.
+- **The approval is a process gate, not a signature.** It records who approved and binds that to the card's content
+  with a hash, so an edit of the sources list, builds, facts, test data or questions voids it. Anyone who can edit
+  the file can also run the approve command; who is allowed to is a matter for your review process.
+- **Test ids follow the order of generation.** A fact that gains or loses a test renumbers the tests after it.
 - **The card is already filled and approved**, so the example runs without a model. To see the model's part, give
   an agent the spec and the skill `extract-facts`.
 - **Not tested on Windows.** Paths and line endings are handled with that in mind (`.gitattributes`, no shell

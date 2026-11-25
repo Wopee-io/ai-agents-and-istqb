@@ -1,6 +1,6 @@
 {
   "generator": "generate.mjs",
-  "cardSha256": "d9a921fdae0aac8ed164596600e12954c1ed9ceb2cd63e233e7aadaaff6187ed",
+  "cardSha256": "cd95e4749cf0cb017ddfb2bbea5f41d674eb431b2ed00b2cc7f00b7f658750f1",
   "counts": {
     "total": 23,
     "ready": 22,
@@ -362,7 +362,7 @@
       ],
       "question": "Does the 20% restaurant discount (over $25) stack with the code LEARN10? If so, in what order, and is the $25 boundary checked before or after the code discount?",
       "why": "Decision table: the spec gives no result for the combination \"restaurant discount applies × LEARN10 applied\".",
-      "status": "open: the spec is silent, question for the analyst"
+      "status": "open"
     },
     {
       "id": "Q2",

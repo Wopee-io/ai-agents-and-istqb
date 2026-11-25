@@ -24,7 +24,8 @@ working on before you act.
    right answer is. Test data the spec does not contain (a menu, a price list) may be read from the app; it goes under
    `data` on the card with a note saying so.
 5. **Only the analyst approves.** Never run `npm run approve` and never edit the `approval` block. Any edit of the
-   card after approval voids it, and the generator stops until a person approves again.
+   card's content (sources, builds, facts, decision tables, test data, questions) voids it, and the generator stops
+   until a person approves again.
 6. **`examples/fooddash/planted-defects.json` and `examples/fooddash/apps/README.md` are the answer key.** Do not read
    them while extracting facts or generating tests.
 

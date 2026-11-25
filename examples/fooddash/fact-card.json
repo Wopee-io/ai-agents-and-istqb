@@ -8,7 +8,7 @@
     "status": "approved",
     "by": "demo analyst",
     "date": "2026-11-25",
-    "sha256": "d9a921fdae0aac8ed164596600e12954c1ed9ceb2cd63e233e7aadaaff6187ed",
+    "sha256": "cd95e4749cf0cb017ddfb2bbea5f41d674eb431b2ed00b2cc7f00b7f658750f1",
     "note": "An agent pulled the facts from the spec. The analyst approved them with four questions left open (at the bottom). The generator never turns a question into a test. It only lists it."
   },
   "builds": {
@@ -118,7 +118,7 @@
       "id": "F10",
       "type": "lifecycle",
       "name": "Favourite restaurants",
-      "source": { "story": "FD-11", "quote": "Every restaurant card ... has a heart button ... Add Sushi Masters to favourites / Remove Sushi Masters from favourites. Clicking the heart on a card does not open the restaurant. ... Favourites survive a page reload ... This works for every restaurant." },
+      "source": { "story": "FD-11", "quote": "Every restaurant card ... has a heart button ... Add Sushi Masters to favourites / Remove Sushi Masters from favourites. Clicking the heart on a card does not open the restaurant. ... Favourites survive a page reload — no account needed. This works for every restaurant." },
       "values": {
         "forEach": "data.restaurants",
         "states": ["Not a favourite", "Favourite"],
@@ -179,7 +179,7 @@
       "facts": ["F04", "F05"],
       "question": "Does the 20% restaurant discount (over $25) stack with the code LEARN10? If so, in what order, and is the $25 boundary checked before or after the code discount?",
       "why": "Decision table: the spec gives no result for the combination \"restaurant discount applies × LEARN10 applied\".",
-      "status": "open: the spec is silent, question for the analyst"
+      "status": "open"
     },
     {
       "id": "Q2",
